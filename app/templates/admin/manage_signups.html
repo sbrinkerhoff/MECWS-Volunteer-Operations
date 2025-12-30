@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h2 class="fw-bold">Manage Signups</h2>
+        <p class="text-muted">Review and confirm volunteer signup requests.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-glass border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Volunteer</th>
+                                <th>Event Date</th>
+                                <th>Shift Time</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for signup in signups %}
+                            <tr>
+                                <td class="ps-4 fw-medium">
+                                    <div class="d-flex flex-column">
+                                        <span>{{ signup.volunteer.email }}</span>
+                                        <small class="text-muted">{{ signup.volunteer.phone_number or 'No phone'
+                                            }}</small>
+                                    </div>
+                                </td>
+                                <td>{{ signup.shift.event.date.strftime('%a, %b %d, %Y') }}</td>
+                                <td>{{ signup.shift.start_time.strftime('%I:%M %p') }} - {{
+                                    signup.shift.end_time.strftime('%I:%M %p') }}</td>
+                                <td>
+                                    <span
+                                        class="badge bg-warning-subtle text-warning border border-warning-subtle">Pending
+                                        Confirmation</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <form action="{{ url_for('admin.confirm_signup', signup_id=signup.id) }}"
+                                            method="POST">
+                                            <button type="submit" class="btn btn-sm btn-success">Confirm</button>
+                                        </form>
+                                        <form action="{{ url_for('admin.reject_signup', signup_id=signup.id) }}"
+                                            method="POST"
+                                            onsubmit="return confirm('Are you sure you want to reject this signup?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    No pending signups found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

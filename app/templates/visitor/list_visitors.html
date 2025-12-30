@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Visitor Directory</h2>
+            <a href="{{ url_for('visitor.create_visitor') }}" class="btn btn-primary">
+                + Register New Visitor
+            </a>
+        </div>
+
+        <div class="card card-glass border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Name</th>
+                                <th>Alias</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visitor in visitors %}
+                            <tr>
+                                <td class="ps-4 fw-medium">{{ visitor.name }}</td>
+                                <td>
+                                    {% if visitor.alias %}
+                                    <span
+                                        class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">{{
+                                        visitor.alias }}</span>
+                                    {% else %}
+                                    <span class="text-muted small">None</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end pe-4">
+                                    {% if today_event %}
+                                    {% set checked_in = visitor.checkins.filter_by(event_id=today_event.id).first() %}
+                                    {% if checked_in %}
+                                    <span class="badge bg-success me-2">Checked In</span>
+                                    {% else %}
+                                    <form
+                                        action="{{ url_for('visitor.check_in', visitor_id=visitor.id, event_id=today_event.id) }}"
+                                        method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-success me-2">Check
+                                            In</button>
+                                    </form>
+                                    {% endif %}
+                                    {% endif %}
+                                    <a href="{{ url_for('visitor.edit_visitor', visitor_id=visitor.id) }}"
+                                        class="btn btn-sm btn-outline-primary">Edit</a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    No visitors registered yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

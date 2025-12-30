@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card card-glass border-0">
+            <div class="card-body p-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold mb-0">{{ title or 'Create New Event' }}</h2>
+                    <a href="{{ url_for('admin.list_events') }}" class="btn btn-outline-secondary btn-sm">Back to
+                        List</a>
+                </div>
+
+                {{ render_form(form) }}
+
+                {% if weather_calendar %}
+                <div class="card card-glass border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-uppercase text-muted ls-1 mb-3">Weather Guidance</h6>
+                        <div class="calendar-grid">
+                            {% for week in weather_calendar %}
+                            <div class="d-flex calendar-week">
+                                {% for day in week %}
+                                <div class="calendar-day p-2 flex-grow-1 border-end border-bottom position-relative 
+                                    {% if day.is_today %}border border-primary border-2{% endif %} 
+                                    {% if day.weather and day.weather.low < 10 %}bg-info bg-opacity-25{% elif day.is_past %}bg-light text-muted{% endif %}"
+                                    style="min-width: 14%; cursor: pointer;"
+                                    onclick="selectDate(this, '{{ day.date }}');">
+
+                                    <div class="d-flex justify-content-between">
+                                        <span class="small fw-bold">{{ day.day_name }}</span>
+                                        <span class="small">{{ day.date.day }}</span>
+                                    </div>
+                                    {% if day.weather %}
+                                    <div class="text-center mt-2">
+                                        <div
+                                            class="fw-bold {% if day.weather.low < 10 %}text-primary-emphasis{% endif %}">
+                                            {{ day.weather.high }}° / {{ day.weather.low }}°
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="alert alert-info mt-4">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Note:</strong> Standard shifts (7:45PM-12AM, 12AM-4AM, 4AM-8AM) will be automatically
+                    generated for this event.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    function selectDate(element, dateStr) {
+        // Set input value
+        document.getElementById('date').value = dateStr;
+
+        // Remove selected class from all days
+        document.querySelectorAll('.calendar-day').forEach(el => {
+            el.classList.remove('selected-day');
+        });
+
+        // Add to clicked element
+        element.classList.add('selected-day');
+    }
+</script>
+{% endblock %}

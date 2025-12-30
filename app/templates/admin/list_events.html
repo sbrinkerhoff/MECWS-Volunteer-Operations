@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Manage Events</h2>
+            <a href="{{ url_for('admin.create_event') }}" class="btn btn-primary">
+                + New Event
+            </a>
+        </div>
+
+        <div class="card card-glass border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Date</th>
+                                <th>Shifts</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td class="ps-4 fw-medium">{{ event.date.strftime('%a, %b %d, %Y') }}</td>
+                                <td>
+                                    <span class="badge bg-secondary rounded-pill">{{ event.shifts.count() }}
+                                        Shifts</span>
+                                </td>
+                                <td>
+                                    <div class="mb-1">
+                                        {% if event.status == 'planned' %}
+                                        <span class="badge bg-warning text-dark">Planned</span>
+                                        {% else %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for shift in event.shifts %}
+                                        {% set count = shift.confirmed_count %}
+                                        {% set capacity = shift.capacity %}
+                                        {% set color = 'success' if count >= capacity else 'warning' if count > 0 else
+                                        'secondary' %}
+                                        <span
+                                            class="badge bg-{{ color }}-subtle text-{{ color }} border border-{{ color }}-subtle"
+                                            style="font-size: 0.7em;"
+                                            title="Shift {{ shift.start_time.strftime('%I:%M %p') }}">
+                                            {{ shift.start_time.strftime('%I:%M') }}: {{ count }}/{{ capacity }}
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{{ url_for('admin.view_event', event_id=event.id) }}"
+                                        class="btn btn-sm btn-outline-primary me-2">View</a>
+                                    <a href="{{ url_for('admin.edit_event', event_id=event.id) }}"
+                                        class="btn btn-sm btn-outline-secondary me-2">Edit</a>
+                                    <form action="{{ url_for('admin.delete_event', event_id=event.id) }}" method="POST"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Are you sure you want to delete this event?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    No events found. Create one to get started.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

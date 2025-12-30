@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="col-lg-8 text-center">
+        <h1 class="display-3 fw-bold mb-4">
+            Welcome to <span class="text-primary-gradient">MECWS</span>
+        </h1>
+        <p class="lead text-muted mb-5">
+            Montpelier Emergency Cold Weather Shelter Operations Portal.
+            <br>
+            Coordinate shifts, manage visitors, and support our community.
+        </p>
+
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-lg px-5 shadow-soft">
+                Staff Login
+            </a>
+            <a href="#" class="btn btn-outline-secondary btn-lg px-5" style="border-radius: 8px;">
+                Learn More
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-md-12">
+        <h2 class="fw-bold mb-4">Dashboard</h2>
+
+        <div class="row g-4">
+            <!-- Quick Stats / Actions -->
+            <div class="col-md-4">
+                <div class="card card-glass h-100 card-hover border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold mb-3">My Shifts</h5>
+                        <p class="text-muted">View your upcoming scheduled volunteer shifts.</p>
+                        <a href="{{ url_for('volunteer.my_schedule') }}"
+                            class="btn btn-sm btn-outline-primary stretched-link">View Schedule</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-glass h-100 card-hover border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold mb-3">Available Shifts</h5>
+                        <p class="text-muted">Browse and sign up for open shelter shifts.</p>
+                        <a href="{{ url_for('volunteer.available_shifts') }}"
+                            class="btn btn-sm btn-outline-primary stretched-link">Find Shifts</a>
+                    </div>
+                </div>
+            </div>
+
+            {% if current_user.role == 'Shelter Supervisor' %}
+            <div class="col-md-4">
+                <div class="card card-glass h-100 card-hover border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold mb-3">Administration</h5>
+                        <p class="text-muted">Manage events, user approvals, and shelter reports.</p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ url_for('admin.list_events') }}"
+                                class="btn btn-sm btn-outline-primary">Events</a>
+                            <a href="{{ url_for('admin.manage_signups') }}"
+                                class="btn btn-sm btn-outline-success">Signups</a>
+                            <a href="{{ url_for('admin.manage_team') }}" class="btn btn-sm btn-outline-dark">Team</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if current_user.role == 'Shelter Supervisor' %}
+            <div class="col-md-4">
+                <div class="card card-glass h-100 card-hover border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold mb-3">Visitor Directory</h5>
+                        <p class="text-muted">Register and manage shelter visitors.</p>
+                        <a href="{{ url_for('visitor.list_visitors') }}"
+                            class="btn btn-sm btn-outline-info stretched-link">Manage Visitors</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

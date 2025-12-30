@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .content {
+            padding: 20px 0;
+        }
+
+        .details {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ffeeba;
+        }
+
+        .footer {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 20px;
+            border-top: 1px solid #dee2e6;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h3>Signup Pending Confirmation</h3>
+        </div>
+        <div class="content">
+            <p>Dear {{ user.name or 'Volunteer' }},</p>
+            <p>Thank you for volunteering! Your signup for the following shift has been received and is
+                <strong>PENDING</strong> approval:</p>
+
+            <div class="details">
+                <strong>Event Date:</strong> {{ shift.event.date.strftime('%A, %B %d, %Y') }}<br>
+                <strong>Shift Time:</strong> {{ shift.start_time.strftime('%I:%M %p') }} - {{
+                shift.end_time.strftime('%I:%M %p') }}
+            </div>
+
+            <p>A supervisor will review your request shortly. You will receive a separate email once your shift is
+                confirmed.</p>
+        </div>
+        <div class="footer">
+            <p>Best regards,<br>MECWS Team</p>
+        </div>
+    </div>
+</body>
+
+</html>

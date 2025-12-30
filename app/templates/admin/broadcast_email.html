@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card card-glass border-0">
+            <div class="card-body p-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold mb-0">Broadcast Email</h2>
+                    <a href="{{ url_for('admin.view_event', event_id=event.id) }}"
+                        class="btn btn-outline-secondary btn-sm">Back to Event</a>
+                </div>
+
+                <div class="alert alert-info border mb-4">
+                    <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>About this broadcast</h5>
+                    <p class="mb-0">This will send an email to all <strong>Team Members</strong> who have opted in to
+                        receive notifications.</p>
+                    <hr>
+                    <p class="mb-0 small">You can use <code>{{ '{{ name }}' }}</code> to insert the volunteer's name and
+                        <code>{{ '{{ date }}' }}</code> to insert the event date ({{ event.date.strftime('%B %d, %Y')
+                        }}).</p>
+                </div>
+
+                {{ render_form(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

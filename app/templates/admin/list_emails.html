@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Email Logs</h2>
+        </div>
+
+        <div class="card card-glass border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Recipient</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Queued At</th>
+                                <th class="pe-4">Sent At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for email in emails %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-medium">
+                                        <a href="{{ url_for('admin.view_email', email_id=email.id) }}"
+                                            class="text-decoration-none text-dark">
+                                            {{ email.recipient }}
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>{{ email.subject }}</td>
+                                <td>
+                                    {% if email.status == 'sent' %}
+                                    <span
+                                        class="badge bg-success-subtle text-success border border-success-subtle">Sent</span>
+                                    {% elif email.status == 'failed' %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle"
+                                        title="{{ email.error_message }}">Failed</span>
+                                    {% else %}
+                                    <span
+                                        class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">
+                                    {{ email.created_at.strftime('%Y-%m-%d %I:%M %p') }}
+                                </td>
+                                <td class="pe-4 text-muted small">
+                                    {% if email.sent_at %}
+                                    {{ email.sent_at.strftime('%Y-%m-%d %I:%M %p') }}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">No emails found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

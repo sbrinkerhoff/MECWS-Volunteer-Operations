@@ -1,0 +1,9 @@
+<p>Hello Supervisor,</p>
+<p>A new volunteer signup request has been received.</p>
+<ul>
+    <li><b>Volunteer:</b> {{ user.email }}</li>
+    <li><b>Event Date:</b> {{ shift.event.date }}</li>
+    <li><b>Shift:</b> {{ shift.start_time }} - {{ shift.end_time }}</li>
+</ul>
+<p>Please <a href="{{ url }}">login to the Admin Panel</a> to confirm or reject this request.</p>
+<p>Sincerely,<br>MECWS System</p>

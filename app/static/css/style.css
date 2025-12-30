@@ -1,0 +1,205 @@
+:root {
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* Premium Palette - Indigo/Slate */
+    --primary: #4F46E5;
+    --primary-hover: #4338ca;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --bg-body: #f8fafc;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Navbar */
+.navbar {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bg-dark-glass {
+    background-color: rgba(15, 23, 42, 0.9) !important;
+}
+
+.text-primary-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Sidebar Layout */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+#sidebar {
+    min-width: 260px;
+    max-width: 260px;
+    background: rgba(15, 23, 42, 0.95);
+    /* Slate 900 */
+    backdrop-filter: blur(10px);
+    color: #fff;
+    transition: all 0.3s;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#sidebar.active {
+    margin-left: -260px;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+}
+
+#sidebar ul li a {
+    padding: 12px 20px;
+    font-size: 0.95em;
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: 0.2s;
+    border-left: 3px solid transparent;
+}
+
+#sidebar ul li a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#sidebar ul li a.active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+    background: linear-gradient(90deg, rgba(79, 70, 229, 0.1) 0%, transparent 100%);
+    border-left-color: var(--primary);
+}
+
+#content {
+    width: 100%;
+    margin-left: 260px;
+    /* Match sidebar width */
+    min-height: 100vh;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Responsive Sidebar */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -260px;
+    }
+
+    #sidebar.active {
+        margin-left: 0;
+    }
+
+    #content {
+        margin-left: 0;
+    }
+}
+
+/* Premium tweaks */
+.nav-section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 1.5rem 20px 0.5rem;
+    font-weight: 600;
+}
+
+/* Cards & Glassmorphism */
+.card-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 16px;
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+    transition: all 0.3s ease;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    padding: 0.6rem 1.25rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.025em;
+}
+
+.form-control {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    border-color: var(--primary);
+}
+
+/* Utilities */
+.shadow-soft {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Calendar */
+.calendar-day.selected-day {
+    border: 2px solid var(--primary) !important;
+    background-color: rgba(79, 70, 229, 0.05);
+    transform: scale(1.02);
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}

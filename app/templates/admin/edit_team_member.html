@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card card-glass border-0">
+            <div class="card-body p-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold mb-0">Edit Team Member</h2>
+                    <a href="{{ url_for('admin.manage_team') }}" class="btn btn-outline-secondary btn-sm">Back to
+                        List</a>
+                </div>
+
+                <p class="text-muted small mb-4">Update details for <strong>{{ user.email }}</strong></p>
+
+                {{ render_form(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

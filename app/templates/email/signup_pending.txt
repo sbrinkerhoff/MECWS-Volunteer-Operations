@@ -1,0 +1,14 @@
+Signup Pending Confirmation
+---------------------------
+
+Dear {{ user.name or 'Volunteer' }},
+
+Thank you for volunteering! Your signup for the following shift has been received and is PENDING approval:
+
+Event Date: {{ shift.event.date.strftime('%A, %B %d, %Y') }}
+Shift Time: {{ shift.start_time.strftime('%I:%M %p') }} - {{ shift.end_time.strftime('%I:%M %p') }}
+
+A supervisor will review your request shortly. You will receive a separate email once your shift is confirmed.
+
+Best regards,
+MECWS Team

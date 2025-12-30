@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Event Details</h6>
+                <h2 class="fw-bold mb-0">{{ event.date.strftime('%A, %B %d, %Y') }}</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('admin.broadcast_email', event_id=event.id) }}"
+                    class="btn btn-outline-info btn-sm"><i class="bi bi-megaphone-fill me-1"></i>Broadcast</a>
+                <a href="{{ url_for('admin.list_events') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+            </div>
+        </div>
+
+        <!-- Event Overview Card -->
+        <div class="card card-glass border-0 mb-4 position-relative" style="z-index: 10;">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">Shift Staffing</h5>
+
+                <!-- Shared Datalist for Autocomplete -->
+                <datalist id="staff_list">
+                    {% for id, label in assign_form.user_id.choices %}
+                    <option value="{{ label }}"></option>
+                    {% endfor %}
+                </datalist>
+
+                <div class="row g-4">
+                    {% for shift in event.shifts %}
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-3 bg-light bg-opacity-50 border h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary">{{ shift.start_time.strftime('%I:%M %p') }} - {{
+                                    shift.end_time.strftime('%I:%M %p') }}</span>
+                                <span class="small text-muted">{{ shift.signups.filter_by(confirmed=True).count() }}/{{
+                                    shift.capacity }} Staffed</span>
+                            </div>
+
+                            <h6 class="fw-bold text-muted small text-uppercase mb-2">Team Members</h6>
+                            <ul class="list-unstyled mb-3">
+                                {% for signup in shift.signups %}
+                                <li class="mb-2 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        {% if signup.confirmed %}
+                                        <i class="bi bi-check-circle-fill text-success me-2" title="Confirmed"></i>
+                                        {% else %}
+                                        <i class="bi bi-clock-fill text-warning me-2" title="Pending Approval"></i>
+                                        {% endif %}
+
+                                        <div>
+                                            <div class="fw-medium small">{{ signup.volunteer.name or
+                                                signup.volunteer.email }}</div>
+                                            <div class="d-flex align-items-center gap-1">
+                                                <span class="badge 
+                                                    {% if signup.volunteer.level == 'Advanced' %}bg-primary-subtle text-primary border border-primary-subtle
+                                                    {% elif signup.volunteer.level == 'Intermediate' %}bg-info-subtle text-info border border-info-subtle
+                                                    {% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %} 
+                                                    py-0 px-1" style="font-size: 0.65rem;">
+                                                    {{ signup.volunteer.level }}
+                                                </span>
+                                                {% if signup.volunteer.phone_number %}
+                                                <div class="text-muted" style="font-size: 0.75rem;">{{
+                                                    signup.volunteer.phone_number }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <form action="{{ url_for('admin.remove_signup', signup_id=signup.id) }}"
+                                            method="POST" class="d-inline"
+                                            onsubmit="return confirm('Remove this volunteer?');">
+                                            <button type="submit" class="btn btn-xs btn-outline-danger py-0 border-0"><i
+                                                    class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </li>
+                                {% else %}
+                                <li class="text-muted small fst-italic">No signups yet.</li>
+                                {% endfor %}
+                            </ul>
+
+                            <!-- Assign Volunteer Form -->
+                            <hr class="opacity-10 my-2">
+                            <form action="{{ url_for('admin.assign_volunteer', shift_id=shift.id) }}" method="POST"
+                                class="d-flex gap-2 align-items-start">
+                                {{ assign_form.hidden_tag() }}
+
+                                <div class="position-relative flex-grow-1">
+                                    <input type="text" name="user_identifier"
+                                        class="form-control form-control-sm search-staff-input"
+                                        placeholder="Type staff name..." autocomplete="off" required>
+                                    <div class="staff-autocomplete-dropdown list-group position-absolute w-100 shadow-lg mt-1"
+                                        style="display:none; z-index: 1050; max-height: 200px; overflow-y: auto;">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-sm btn-outline-primary px-2">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Visitor Check-Ins Summary (If needed) -->
+        <div class="card card-glass border-0 position-relative" style="z-index: 5;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Visitor Check-Ins</h5>
+                    <span class="badge bg-info text-dark">{{ event.checkins.count() if event.checkins else 0 }}
+                        Guests</span>
+                </div>
+
+                <!-- Visitor Check-In Form with Autocomplete -->
+                <form action="{{ url_for('admin.checkin_visitor', event_id=event.id) }}" method="POST"
+                    class="mb-4 d-flex gap-2 align-items-start">
+                    <!-- CSRF Token (Assumed handled globally or we need a hidden tag if using WTForms, but here we used raw HTML form previously too or manual input) -->
+                    {# Since existing forms use assign_form.hidden_tag(), we should optimally use a form object or
+                    standard csrf.
+                    For simplicity and consistency with the "Assign Staff" raw input approach we just added:
+                    We'll rely on global CSRF protection if enabled, but we need a token.
+                    Let's re-use the hidden tag from assign_form as a hack, OR ideally pass a generic csrf token.
+                    However, since 'assign_form' is available, we can grab its csrf_token. #}
+                    {{ assign_form.hidden_tag() }}
+
+                    <div class="position-relative flex-grow-1">
+                        <input type="text" name="visitor_name" class="form-control form-control-sm search-visitor-input"
+                            placeholder="Scan or type visitor name..." autocomplete="off" required>
+                        <div class="visitor-autocomplete-dropdown list-group position-absolute w-100 shadow-lg mt-1"
+                            style="display:none; z-index: 1050; max-height: 200px; overflow-y: auto;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        Check In
+                    </button>
+                </form>
+
+                {% if event.checkins and event.checkins.count() > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Checked In At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for checkin in event.checkins %}
+                            <tr>
+                                <td>{{ checkin.visitor.name }} <span class="text-muted small">{{ checkin.visitor.alias
+                                        }}</span></td>
+                                <td>{{ checkin.check_in_time.strftime('%I:%M %p') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted small mb-0">No visitors checked in for this night.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Staff Data
+        const staffList = [
+            {% for id, label in assign_form.user_id.choices %}
+            {{ label | tojson }},
+        {% endfor %}
+        ];
+
+    // Visitor Data
+    const visitorList = [
+        {% for v in visitors %}
+        {{ v.name | tojson }},
+        {% endfor %}
+        ];
+
+    // Helper: Setup Autocomplete for a class
+    function setupAutocomplete(inputClass, dataList) {
+        document.querySelectorAll(inputClass).forEach(input => {
+            const dropdown = input.nextElementSibling;
+
+            input.addEventListener('input', function () {
+                const val = this.value.toLowerCase();
+                dropdown.innerHTML = '';
+
+                if (!val) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+
+                const matches = dataList.filter(s => s && s.toLowerCase().includes(val));
+
+                if (matches.length > 0) {
+                    dropdown.style.display = 'block';
+                    matches.forEach(match => {
+                        const item = document.createElement('a');
+                        item.href = "#";
+                        item.className = "list-group-item list-group-item-action list-group-item-light py-2 px-3 small";
+                        item.textContent = match;
+                        item.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            input.value = match;
+                            dropdown.style.display = 'none';
+                        });
+                        dropdown.appendChild(item);
+                    });
+                } else {
+                    dropdown.style.display = 'none';
+                }
+            });
+
+            // Hide on click outside
+            document.addEventListener('click', function (e) {
+                if (e.target !== input && e.target !== dropdown) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Initialize for both fields
+    setupAutocomplete('.search-staff-input', staffList);
+    setupAutocomplete('.search-visitor-input', visitorList);
+    });
+</script>
+{% endblock %}
