@@ -131,6 +131,9 @@ def profile():
     if form.validate_on_submit():
         current_user.name = form.name.data
         current_user.phone_number = form.phone_number.data
+        current_user.address_street = form.address_street.data
+        current_user.address_city = form.address_city.data
+        current_user.address_state = form.address_state.data
         current_user.emergency_contact = form.emergency_contact.data
         current_user.email_allowed = form.email_allowed.data
 

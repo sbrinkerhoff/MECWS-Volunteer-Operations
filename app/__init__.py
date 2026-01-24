@@ -8,6 +8,11 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    import logging
+    if app.debug or app.testing:
+        app.logger.setLevel(logging.INFO)
+
+
     # Initialize extensions
     db.init_app(app)
     login_manager.init_app(app)

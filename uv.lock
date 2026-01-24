@@ -489,7 +489,7 @@ wheels = [
 ]
 
 [[package]]
-name = "mecws-ops"
+name = "mecws-volunteer-ops"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

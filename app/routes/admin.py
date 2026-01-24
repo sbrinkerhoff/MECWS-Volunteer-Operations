@@ -291,6 +291,9 @@ def add_team_member():
             name=form.name.data,
             email=form.email.data,
             phone_number=form.phone_number.data,
+            address_street=form.address_street.data,
+            address_city=form.address_city.data,
+            address_state=form.address_state.data,
             emergency_contact=form.emergency_contact.data,
             role=form.role.data,
             level=form.level.data,
@@ -319,6 +322,9 @@ def edit_team_member(user_id):
         user.name = form.name.data
         user.email = form.email.data
         user.phone_number = form.phone_number.data
+        user.address_street = form.address_street.data
+        user.address_city = form.address_city.data
+        user.address_state = form.address_state.data
         user.emergency_contact = form.emergency_contact.data
         user.role = form.role.data
         user.level = form.level.data

@@ -13,6 +13,9 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(100))
     emergency_contact = db.Column(db.String(255))
     phone_number = db.Column(db.String(20))
+    address_street = db.Column(db.String(255))
+    address_city = db.Column(db.String(100))
+    address_state = db.Column(db.String(50))
     role = db.Column(
         db.String(50), default="Team Member"
     )  # 'Shelter Supervisor' or 'Team Member'

@@ -24,4 +24,4 @@ EXPOSE 5000
 # Declare instance directory as a volume to persist database
 VOLUME ["/app/instance"]
 
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["sh", "-c", "flask db upgrade && flask run --host=0.0.0.0"]

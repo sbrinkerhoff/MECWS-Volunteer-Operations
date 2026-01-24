@@ -37,6 +37,9 @@ class TeamMemberForm(FlaskForm):
     name = StringField("Name")
     email = StringField("Email Address", validators=[DataRequired()])
     phone_number = StringField("Phone Number")
+    address_street = StringField("Street Address")
+    address_city = StringField("City")
+    address_state = StringField("State")
     emergency_contact = StringField("Emergency Contact")
     role = SelectField(
         "Role",
@@ -70,6 +73,9 @@ class TeamMemberForm(FlaskForm):
 class ProfileForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     phone_number = StringField("Phone Number")
+    address_street = StringField("Street Address")
+    address_city = StringField("City")
+    address_state = StringField("State")
     emergency_contact = StringField("Emergency Contact")
     shift_preference = SelectMultipleField(
         "Shift Preference",
