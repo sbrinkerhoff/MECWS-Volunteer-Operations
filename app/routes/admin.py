@@ -330,26 +330,47 @@ def edit_team_member(user_id):
         form.shift_preference.data = user.shift_preference.split(",")
 
     if form.validate_on_submit():
-        user.name = form.name.data
-        user.email = form.email.data
-        user.phone_number = form.phone_number.data
-        user.address_street = form.address_street.data
-        user.address_city = form.address_city.data
-        user.address_state = form.address_state.data
-        user.emergency_contact = form.emergency_contact.data
-        user.role = form.role.data
-        user.level = form.level.data
-        user.email_allowed = form.email_allowed.data
-
-        # Convert list back to string for storage
-        user.shift_preference = ",".join(form.shift_preference.data)
-
-        db.session.commit()
+        # Track changes
+        changes = []
         
-        from app.audit import log_audit
-        log_audit("update_user", f"Updated profile for {user.email}", user=current_user)
-        
-        flash(f"Team member {user.email} updated successfully.", "success")
+        # Helper to check and update
+        def update_field(field_name, new_value, label):
+            old_value = getattr(user, field_name)
+            # Normalize for comparison
+            if old_value is None: old_value = ""
+            if new_value is None: new_value = ""
+            
+            if str(old_value) != str(new_value):
+                setattr(user, field_name, new_value if new_value != "" else None)
+                changes.append(f"{label}: '{old_value}' -> '{new_value}'")
+
+        update_field("name", form.name.data, "Name")
+        update_field("email", form.email.data, "Email")
+        update_field("phone_number", form.phone_number.data, "Phone")
+        update_field("address_street", form.address_street.data, "Street")
+        update_field("address_city", form.address_city.data, "City")
+        update_field("address_state", form.address_state.data, "State")
+        update_field("emergency_contact", form.emergency_contact.data, "Emergency Contact")
+        update_field("role", form.role.data, "Role")
+        update_field("level", form.level.data, "Level")
+        update_field("email_allowed", form.email_allowed.data, "Email Allowed")
+
+        # Special handling for shift preference list
+        new_prefs = ",".join(form.shift_preference.data) if form.shift_preference.data else ""
+        old_prefs = user.shift_preference or ""
+        if old_prefs != new_prefs:
+             user.shift_preference = new_prefs
+             changes.append(f"Mac Prefs: '{old_prefs}' -> '{new_prefs}'")
+
+        if changes:
+            db.session.commit()
+            from app.audit import log_audit
+            log_str = "; ".join(changes)
+            log_audit("update_user", f"Updated {user.email}: {log_str}", user=current_user)
+            flash(f"Team member updated successfully.", "success")
+        else:
+            flash(f"No changes made to {user.email}.", "info")
+            
         return redirect(url_for("admin.manage_team"))
 
     return render_template("admin/edit_team_member.html", form=form, user=user)

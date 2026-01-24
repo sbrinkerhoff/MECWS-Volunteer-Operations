@@ -72,3 +72,14 @@ def edit_visitor(visitor_id):
     return render_template(
         "visitor/create_visitor.html", form=form, title="Edit Visitor"
     )
+
+
+@visitor_bp.route("/<int:visitor_id>")
+@login_required
+def view_visitor(visitor_id):
+    visitor = Visitor.query.get_or_404(visitor_id)
+    checkins = CheckIn.query.filter_by(visitor_id=visitor.id).order_by(CheckIn.check_in_time.desc()).all()
+    
+    return render_template(
+        "visitor/view_visitor.html", visitor=visitor, checkins=checkins
+    )

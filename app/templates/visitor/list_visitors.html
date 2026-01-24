@@ -24,7 +24,12 @@
                         <tbody>
                             {% for visitor in visitors %}
                             <tr>
-                                <td class="ps-4 fw-medium">{{ visitor.name }}</td>
+                                <td class="ps-4 fw-medium">
+                                    <a href="{{ url_for('visitor.view_visitor', visitor_id=visitor.id) }}"
+                                        class="text-decoration-none text-dark">
+                                        {{ visitor.name }}
+                                    </a>
+                                </td>
                                 <td>
                                     {% if visitor.alias %}
                                     <span
@@ -48,8 +53,8 @@
                                     </form>
                                     {% endif %}
                                     {% endif %}
-                                    <a href="{{ url_for('visitor.edit_visitor', visitor_id=visitor.id) }}"
-                                        class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <a href="{{ url_for('visitor.view_visitor', visitor_id=visitor.id) }}"
+                                        class="btn btn-sm btn-outline-secondary">View</a>
                                 </td>
                             </tr>
                             {% else %}
