@@ -9,8 +9,27 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     import logging
-    if app.debug or app.testing:
-        app.logger.setLevel(logging.INFO)
+    from logging.handlers import RotatingFileHandler
+    import os
+
+    if not app.debug and not app.testing:
+        # In production, we might want cleaner output, but here we setup specific
+        # logging for application events regardless of debug mode, or just for production.
+        # Let's configure a specific logger or attach to app.logger
+        pass
+
+    # Basic File Logging config
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    
+    file_handler = RotatingFileHandler('logs/mecws.log', maxBytes=1024 * 1024, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('MECWS startup')
 
 
     # Initialize extensions
