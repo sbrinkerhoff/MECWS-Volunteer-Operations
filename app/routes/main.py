@@ -147,6 +147,10 @@ def profile():
             current_user.shift_preference = ""
 
         db.session.commit()
+        
+        from app.audit import log_audit
+        log_audit("update_profile", "User updated their own profile", user=current_user)
+        
         flash("Your profile has been updated.", "success")
         return redirect(url_for("main.profile"))
 

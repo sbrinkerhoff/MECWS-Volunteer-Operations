@@ -78,12 +78,16 @@ def edit_event(event_id):
     return render_template("admin/create_event.html", form=form, title="Edit Event")
 
 
-@admin_bp.route("/events/<int:event_id>/delete", methods=["POST"])
-def delete_event(event_id):
+@admin_bp.route("/events/<int:event_id>/cancel", methods=["POST"])
+def cancel_event(event_id):
     event = Event.query.get_or_404(event_id)
-    db.session.delete(event)
+    event.status = "cancelled"
     db.session.commit()
-    flash("Event deleted successfully.", "success")
+    
+    from app.audit import log_audit
+    log_audit("cancel_event", f"Cancelled event for {event.date}", user=current_user)
+    
+    flash("Event cancelled successfully.", "success")
     return redirect(url_for("admin.list_events"))
 
 
@@ -307,6 +311,9 @@ def add_team_member():
         db.session.add(user)
         db.session.commit()
 
+        from app.audit import log_audit
+        log_audit("create_user", f"Created team member {user.email}", user=current_user)
+
         flash(f"Team member {user.email} created successfully.", "success")
         return redirect(url_for("admin.manage_team"))
 
@@ -338,6 +345,10 @@ def edit_team_member(user_id):
         user.shift_preference = ",".join(form.shift_preference.data)
 
         db.session.commit()
+        
+        from app.audit import log_audit
+        log_audit("update_user", f"Updated profile for {user.email}", user=current_user)
+        
         flash(f"Team member {user.email} updated successfully.", "success")
         return redirect(url_for("admin.manage_team"))
 
