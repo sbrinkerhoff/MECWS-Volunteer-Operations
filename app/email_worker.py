@@ -69,7 +69,7 @@ def start_email_worker(app):
                     # Prevent tight loop on extensive DB error
                     time.sleep(5)
 
-                time.sleep(15)
+                time.sleep(10)
 
     thread = threading.Thread(target=worker, daemon=True)
     thread.start()
