@@ -12,10 +12,46 @@
                         List</a>
                 </div>
 
-                {{ render_form(form) }}
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.date.label(class="form-label") }}
+                        <div class="position-relative">
+                            {{ form.date(class="form-control", type="date", oninput="updateDayOfWeek(this.value)",
+                            style="padding-right: 120px;") }}
+                            <span id="day-of-week-display" class="position-absolute text-muted fw-bold small"
+                                style="right: 40px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 5;">
+                            </span>
+                        </div>
+                        {% if form.date.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.date.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.status.label(class="form-label") }}
+                        {{ form.status(class="form-select") }}
+                        {% if form.status.errors %}
+                        <div class="text-danger mt-1 small">
+                            {% for error in form.status.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
 
                 {% if weather_calendar %}
-                <div class="card card-glass border-0 mb-4">
+                <div class="card card-glass border-0 mb-4 mt-4">
                     <div class="card-body p-4">
                         <h6 class="fw-bold text-uppercase text-muted ls-1 mb-3">Weather Guidance</h6>
                         <div class="calendar-grid">
@@ -61,17 +97,48 @@
 </div>
 
 <script>
+    function updateDayOfWeek(dateStr) {
+        const daySpan = document.getElementById('day-of-week-display');
+        if (!daySpan) return;
+
+        if (!dateStr) {
+            daySpan.textContent = '';
+            return;
+        }
+
+        // Create date object (append time to ensure local timezone parsing doesn't shift day)
+        const date = new Date(dateStr + 'T12:00:00');
+        const options = { weekday: 'long' };
+        try {
+            daySpan.textContent = new Intl.DateTimeFormat('en-US', options).format(date);
+        } catch (e) {
+            daySpan.textContent = '';
+        }
+    }
+
     function selectDate(element, dateStr) {
         // Set input value
-        document.getElementById('date').value = dateStr;
+        const dateInput = document.getElementById('date');
+        if (dateInput) {
+            dateInput.value = dateStr;
+            // Update Day of Week manually since setting value programmatically doesn't fire input event
+            updateDayOfWeek(dateStr);
+        }
 
         // Remove selected class from all days
         document.querySelectorAll('.calendar-day').forEach(el => {
             el.classList.remove('selected-day');
         });
 
-        // Add to clicked element
+        // Add to clicked element (optional visual feedback)
         element.classList.add('selected-day');
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateInput = document.getElementById('date');
+        if (dateInput && dateInput.value) {
+            updateDayOfWeek(dateInput.value);
+        }
+    });
 </script>
 {% endblock %}
