@@ -41,6 +41,10 @@ def create_event():
             db.session.add(shift)
 
         db.session.commit()
+        
+        from app.audit import log_audit
+        log_audit("create_event", f"Created event for {event.date} with status {event.status}")
+        
         flash("Event and standard shifts created successfully.", "success")
         return redirect(url_for("admin.list_events"))
 

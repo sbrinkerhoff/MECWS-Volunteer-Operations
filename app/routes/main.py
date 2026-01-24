@@ -98,6 +98,9 @@ def validate_magic_link(token):
         
     # Log in user
     user = token_entry.user
+    
+    from app.audit import log_audit
+    log_audit("login", "Magic Link Success", user=user)
     login_user(user)
     
     # Invalidate token (one-time use)
