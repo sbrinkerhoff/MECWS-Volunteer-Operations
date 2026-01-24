@@ -46,7 +46,11 @@
                     </div>
 
                     <div class="mb-3">
+                        {% if title == 'Edit Event' %}
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        {% else %}
                         {{ form.submit(class="btn btn-primary") }}
+                        {% endif %}
                     </div>
                 </form>
 
