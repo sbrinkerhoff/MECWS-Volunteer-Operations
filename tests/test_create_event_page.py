@@ -24,3 +24,5 @@ def test_create_event_page_renders_with_weather(client, app):
     assert b"Weather Guidance" in resp.data
     # Check for calendar grid existence (css class)
     assert b"calendar-grid" in resp.data
+    # Check for Day of Week JS logic
+    assert b"function updateDayOfWeek(dateStr)" in resp.data

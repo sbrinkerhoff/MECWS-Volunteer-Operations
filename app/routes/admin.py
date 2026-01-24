@@ -49,8 +49,13 @@ def create_event():
 
     weather_calendar = get_weather_calendar()
 
+    from flask import current_app
+    lat = current_app.config["WEATHER_LAT"]
+    lon = current_app.config["WEATHER_LON"]
+    weather_url = f"https://forecast.weather.gov/MapClick.php?lat={lat}&lon={lon}"
+
     return render_template(
-        "admin/create_event.html", form=form, weather_calendar=weather_calendar
+        "admin/create_event.html", form=form, weather_calendar=weather_calendar, weather_url=weather_url
     )
 
 

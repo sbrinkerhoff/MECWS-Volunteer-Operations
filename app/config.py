@@ -13,8 +13,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:///" + os.path.join(basedir, "../instance/mecws.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SHELTER_NAME = os.environ.get("SHELTER_NAME") or "MECWS Shelter"
-    WEATHER_LAT = float(os.environ.get("WEATHER_LAT") or 44.2601)
-    WEATHER_LON = float(os.environ.get("WEATHER_LON") or -72.5754)
+    WEATHER_LAT = float(os.environ.get("WEATHER_LAT") or 44.2035) # KMPV (Knapp State Airport)
+    WEATHER_LON = float(os.environ.get("WEATHER_LON") or -72.5621)
 
     # Mail Config
     MAIL_SERVER = os.environ.get("MAIL_SERVER")

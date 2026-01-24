@@ -11,12 +11,7 @@ volunteer_bp = Blueprint("volunteer", __name__, url_prefix="/volunteer")
 @volunteer_bp.route("/shifts")
 @login_required
 def available_shifts():
-    # Only show future or today's events
-    # Only show future or today's events
-    query = Event.query.filter(Event.date >= date.today())
-
-    # query = Event.query.filter(Event.date >= date.today())
-    query = Event.query.filter(Event.date >= date.today())
+    query = Event.query.filter(Event.date >= date.today(), Event.status == "confirmed")
 
     events = query.order_by(Event.date).all()
     print(

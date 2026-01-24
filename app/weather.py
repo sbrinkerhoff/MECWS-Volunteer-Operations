@@ -7,49 +7,94 @@ logger = logging.getLogger(__name__)
 
 def get_weather_forecast():
     """
-    Fetches 14-day weather forecast for Montpelier, VT (05602).
+    Fetches 7-day weather forecast for local coordinates using National Weather Service (weather.gov).
     Returns a list of dicts: {'date': date_obj, 'high': int, 'low': int}
     """
     from flask import current_app
 
-    # Montpelier, VT specific coordinates
     LAT = current_app.config["WEATHER_LAT"]
     LON = current_app.config["WEATHER_LON"]
+    
+    # NWS requires a specific User-Agent
+    headers = {
+        "User-Agent": "MECWS-Volunteer-Operations/1.0 (contact@mecws.org)"
+    }
 
     try:
-        url = "https://api.open-meteo.com/v1/forecast"
-        params = {
-            "latitude": LAT,
-            "longitude": LON,
-            "daily": ["temperature_2m_max", "temperature_2m_min"],
-            "temperature_unit": "fahrenheit",
-            "timezone": "America/New_York",
-            "forecast_days": 14,
-        }
-
-        response = requests.get(url, params=params, timeout=5)
+        # Step 1: Get Grid Points (Metadata)
+        points_url = f"https://api.weather.gov/points/{LAT},{LON}"
+        response = requests.get(points_url, headers=headers, timeout=5)
         response.raise_for_status()
-        data = response.json()
+        points_data = response.json()
+        
+        forecast_url = points_data.get("properties", {}).get("forecast")
+        if not forecast_url:
+            logger.error("NWS: No forecast URL found in points data.")
+            return []
 
-        daily = data.get("daily", {})
-        dates = daily.get("time", [])
-        highs = daily.get("temperature_2m_max", [])
-        lows = daily.get("temperature_2m_min", [])
+        # Step 2: Get Forecast
+        response = requests.get(forecast_url, headers=headers, timeout=5)
+        response.raise_for_status()
+        forecast_data = response.json()
+        
+        periods = forecast_data.get("properties", {}).get("periods", [])
+        
+        # Process NWS periods into daily structure
+        daily_weather = {}
+        
+        for p in periods:
+            # parsed start time usually iso formatted: 2023-12-25T18:00:00-05:00
+            start_time_str = p.get("startTime", "")
+            if len(start_time_str) < 10:
+                continue
+                
+            date_str = start_time_str[:10] # YYYY-MM-DD
+            
+            if date_str not in daily_weather:
+                daily_weather[date_str] = {"high": None, "low": None}
+            
+            temp = p.get("temperature")
+            is_daytime = p.get("isDaytime")
+            
+            if is_daytime:
+                # Store high. If we somehow have multiple day periods for same date, take max.
+                current_high = daily_weather[date_str]["high"]
+                if current_high is None or temp > current_high:
+                    daily_weather[date_str]["high"] = temp
+            else:
+                # Store low
+                current_low = daily_weather[date_str]["low"]
+                if current_low is None or temp < current_low:
+                    daily_weather[date_str]["low"] = temp
 
+        # Format output list
         forecast = []
-        for i, date_str in enumerate(dates):
-            forecast.append(
-                {
-                    "date": datetime.strptime(date_str, "%Y-%m-%d").date(),
-                    "high": round(highs[i]),
-                    "low": round(lows[i]),
-                }
-            )
-
+        for d_str, data in daily_weather.items():
+            try:
+                d_obj = datetime.strptime(d_str, "%Y-%m-%d").date()
+                
+                # Fill missing values if NWS didn't provide one (e.g. night only forecast for today)
+                # We interpret None as "No Data" but template expects number ideally.
+                # However, template logic {{ day.weather.high }} might just show None.
+                # Let's verify template: "day.weather.high" output directly. 
+                # If None, it shows "None". 
+                # Let's keep it None/raw so valid data is honest.
+                
+                forecast.append({
+                    "date": d_obj,
+                    "high": data["high"],
+                    "low": data["low"]
+                })
+            except ValueError:
+                continue
+                
+        # Sort by date
+        forecast.sort(key=lambda x: x["date"])
+        
         return forecast
 
     except Exception as e:
-        logger.error(f"Error fetching weather: {e}")
+        logger.error(f"Error fetching weather from NWS: {e}")
         return []
 
 

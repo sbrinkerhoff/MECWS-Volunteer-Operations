@@ -16,8 +16,13 @@ class EventForm(FlaskForm):
     date = DateField("Date", validators=[DataRequired()])
     status = SelectField(
         "Status",
-        choices=[("planned", "Planned"), ("active", "Active")],
-        default="planned",
+        choices=[
+            ("projected", "Projected"),
+            ("confirmed", "Confirmed"),
+            ("completed", "Completed"),
+            ("cancelled", "Cancelled"),
+        ],
+        default="projected",
     )
     submit = SubmitField("Create Event")
 
