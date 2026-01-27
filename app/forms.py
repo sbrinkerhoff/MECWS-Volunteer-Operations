@@ -67,6 +67,7 @@ class TeamMemberForm(FlaskForm):
         widget=widgets.ListWidget(prefix_label=False),
     )
     email_allowed = BooleanField('Email Notifications Allowed', default=True)
+    notes = TextAreaField("Notes")
     submit = SubmitField("Update Member")
 
 

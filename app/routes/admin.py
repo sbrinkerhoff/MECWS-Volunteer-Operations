@@ -353,6 +353,7 @@ def edit_team_member(user_id):
         update_field("emergency_contact", form.emergency_contact.data, "Emergency Contact")
         update_field("role", form.role.data, "Role")
         update_field("level", form.level.data, "Level")
+        update_field("notes", form.notes.data, "Notes")
         update_field("email_allowed", form.email_allowed.data, "Email Allowed")
 
         # Special handling for shift preference list

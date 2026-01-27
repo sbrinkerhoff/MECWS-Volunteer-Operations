@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h6 class="text-uppercase text-muted ls-1 mb-1">Visitor Profile</h6>
+                <h2 class="fw-bold mb-0">{{ visitor.name }}</h2>
+                {% if visitor.alias %}
+                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle mt-2">{{
+                    visitor.alias }}</span>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('visitor.list_visitors') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+        </div>
+
+        <div class="card card-glass border-0">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3">Visit History</h5>
+
+                {% if checkins %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-3">Date</th>
+                                <th>Checked In Time</th>
+                                <th>Event Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for checkin in checkins %}
+                            <tr>
+                                <td class="ps-3 fw-medium">
+                                    <a href="{{ url_for('admin.view_event', event_id=checkin.event.id) }}"
+                                        class="text-decoration-none">
+                                        {{ checkin.event.date.strftime('%A, %B %d, %Y') }}
+                                    </a>
+                                </td>
+                                <td>{{ checkin.check_in_time.strftime('%I:%M %p') }}</td>
+                                <td>
+                                    {% if checkin.event.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                    {% elif checkin.event.status == 'completed' %}
+                                    <span class="badge bg-secondary">Completed</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted bg-light rounded-3">
+                    <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+                    No visits recorded yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-3 text-end">
+            <a href="{{ url_for('visitor.edit_visitor', visitor_id=visitor.id) }}"
+                class="text-decoration-none small text-muted">
+                <i class="bi bi-pencil me-1"></i> Edit Profile
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -71,6 +71,11 @@
                         {{ form.shift_preference(class="list-unstyled") }}
                     </div>
 
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes(class="form-control", rows="4") }}
+                    </div>
+
                     <div class="mb-4 form-check">
                         {{ form.email_allowed(class="form-check-input") }}
                         {{ form.email_allowed.label(class="form-check-label") }}
