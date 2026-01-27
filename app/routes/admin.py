@@ -1,7 +1,9 @@
 from datetime import time
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for, send_file
 from flask_login import current_user, login_required
+import pandas as pd
+from io import BytesIO
 
 from app.forms import AssignVolunteerForm, EventForm, TeamMemberForm
 from app.models import Event, Shift, Signup, User, db
@@ -375,6 +377,109 @@ def edit_team_member(user_id):
         return redirect(url_for("admin.manage_team"))
 
     return render_template("admin/edit_team_member.html", form=form, user=user)
+
+
+@admin_bp.route("/team/import", methods=["GET", "POST"])
+def import_team():
+    from app.forms import UploadTeamForm
+    form = UploadTeamForm()
+    
+    if form.validate_on_submit():
+        file = form.file.data
+        try:
+            df = pd.read_excel(file)
+            
+            count = 0
+            updated = 0
+            
+            for index, row in df.iterrows():
+                # Case insensitive column matching using upper/lower
+                row_map = {str(k).lower(): v for k, v in row.items()}
+                
+                email = row_map.get('email')
+                if not email or pd.isna(email):
+                    continue
+                    
+                email = str(email).strip().lower()
+                
+                user = User.query.filter_by(email=email).first()
+                if not user:
+                    user = User(email=email)
+                    user.role = "Team Member"
+                    db.session.add(user)
+                    count += 1
+                else:
+                    updated += 1
+                
+                # Helper to safely get value
+                def get_val(keys):
+                    for k in keys:
+                        if k in row_map and not pd.isna(row_map[k]):
+                            val = row_map[k]
+                            # Clean up nan/nat
+                            if pd.isna(val): return None
+                            return val
+                    return None
+
+                name = get_val(['name', 'full name', 'fullname'])
+                if name: user.name = str(name)
+                
+                phone = get_val(['phone', 'phone number', 'cell'])
+                if phone: user.phone_number = str(phone)
+                
+                role = get_val(['role', 'job title'])
+                if role: user.role = str(role)
+
+                notes = get_val(['notes', 'comments'])
+                if notes: user.notes = str(notes)
+                
+            db.session.commit()
+            
+            from app.audit import log_audit
+            log_audit("import_team", f"Imported {count} new, Updated {updated}", user=current_user)
+            
+            flash(f"Imported {count} new members and updated {updated} existing members.", "success")
+            return redirect(url_for("admin.manage_team"))
+            
+        except Exception as e:
+            flash(f"Error importing file: {e}", "danger")
+            
+    return render_template("admin/import_team.html", form=form)
+
+
+@admin_bp.route("/team/export")
+def export_team():
+    users = User.query.all()
+    
+    data = []
+    for user in users:
+        data.append({
+            "Name": user.name,
+            "Email": user.email,
+            "Phone": user.phone_number,
+            "Role": user.role,
+            "Level": user.level,
+            "Address": user.address_street,
+            "City": user.address_city,
+            "State": user.address_state,
+            "Emergency Contact": user.emergency_contact,
+            "Notes": user.notes,
+        })
+    
+    df = pd.DataFrame(data)
+    
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Volunteers')
+    
+    output.seek(0)
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='mecws_volunteers.xlsx'
+    )
 
 
 @admin_bp.route("/emails")

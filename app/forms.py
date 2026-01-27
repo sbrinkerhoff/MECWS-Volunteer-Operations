@@ -11,6 +11,8 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired
 
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+
 
 class EventForm(FlaskForm):
     date = DateField("Date", validators=[DataRequired()])
@@ -110,3 +112,11 @@ class BroadcastEmailForm(FlaskForm):
     subject = StringField("Subject", validators=[DataRequired()])
     message = TextAreaField("Message", validators=[DataRequired()], description="Use {{ name }} for volunteer name and {{ date }} for event date.")
     submit = SubmitField("Send Email")
+
+
+class UploadTeamForm(FlaskForm):
+    file = FileField("Excel File", validators=[
+        FileRequired(),
+        FileAllowed(['xlsx', 'xls'], 'Excel files only!')
+    ])
+    submit = SubmitField("Upload Members")
