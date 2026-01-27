@@ -29,7 +29,7 @@ def list_events():
 def create_event():
     form = EventForm()
     if form.validate_on_submit():
-        event = Event(date=form.date.data, status=form.status.data)
+        event = Event(date=form.date.data, status=form.status.data, description=form.description.data)
         db.session.add(event)
 
         # Create standard shifts
@@ -73,11 +73,42 @@ def edit_event(event_id):
     if form.validate_on_submit():
         event.date = form.date.data
         event.status = form.status.data
+        event.description = form.description.data
         db.session.commit()
         flash("Event updated successfully.", "success")
         return redirect(url_for("admin.list_events"))
 
     return render_template("admin/create_event.html", form=form, title="Edit Event")
+
+
+@admin_bp.route("/events/<int:event_id>/update_meta", methods=["POST"])
+def update_event_meta(event_id):
+    event = Event.query.get_or_404(event_id)
+    
+    date_str = request.form.get("date")
+    status = request.form.get("status")
+    description = request.form.get("description")
+    
+    from datetime import datetime
+    try:
+        if date_str:
+            event.date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        flash("Invalid date format.", "danger")
+        return redirect(url_for("admin.view_event", event_id=event_id))
+        
+    if status:
+        event.status = status
+        
+    event.description = description
+    
+    db.session.commit()
+    
+    from app.audit import log_audit
+    log_audit("update_event", f"Updated metadata for {event.date}", user=current_user)
+    
+    flash("Event updated successfully.", "success")
+    return redirect(url_for("admin.view_event", event_id=event_id))
 
 
 @admin_bp.route("/events/<int:event_id>/cancel", methods=["POST"])

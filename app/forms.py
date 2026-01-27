@@ -26,6 +26,7 @@ class EventForm(FlaskForm):
         ],
         default="projected",
     )
+    description = TextAreaField("Description")
     submit = SubmitField("Create Event")
 
 

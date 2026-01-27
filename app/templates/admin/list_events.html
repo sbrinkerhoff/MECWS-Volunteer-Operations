@@ -24,7 +24,8 @@
                         </thead>
                         <tbody>
                             {% for event in events %}
-                            <tr>
+                            <tr style="cursor: pointer;"
+                                onclick="window.location='{{ url_for('admin.view_event', event_id=event.id) }}'">
                                 <td class="ps-4 fw-medium">{{ event.date.strftime('%a, %b %d, %Y') }}</td>
                                 <td>
                                     <span class="badge bg-secondary rounded-pill">{{ event.shifts.count() }}
@@ -59,11 +60,9 @@
                                         {% endfor %}
                                     </div>
                                 </td>
-                                <td class="text-end pe-4">
+                                <td class="text-end pe-4" onclick="event.stopPropagation()">
                                     <a href="{{ url_for('admin.view_event', event_id=event.id) }}"
                                         class="btn btn-sm btn-outline-primary me-2">View</a>
-                                    <a href="{{ url_for('admin.edit_event', event_id=event.id) }}"
-                                        class="btn btn-sm btn-outline-secondary me-2">Edit</a>
                                     {% if event.status != 'cancelled' %}
                                     <form action="{{ url_for('admin.cancel_event', event_id=event.id) }}" method="POST"
                                         class="d-inline"
