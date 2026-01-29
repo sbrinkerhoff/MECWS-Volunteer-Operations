@@ -20,7 +20,7 @@ def available_shifts():
     return render_template("volunteer/available_shifts.html", events=events)
 
 
-@volunteer_bp.route("/signup/<int:shift_id>", methods=["POST"])
+@volunteer_bp.route("/signup/<shift_id>", methods=["POST"])
 @login_required
 def signup(shift_id):
     shift = Shift.query.get_or_404(shift_id)
@@ -94,7 +94,7 @@ def my_schedule():
     return render_template("volunteer/my_schedule.html", signups=my_signups)
 
 
-@volunteer_bp.route("/signup/<int:signup_id>/cancel", methods=["POST"])
+@volunteer_bp.route("/signup/<signup_id>/cancel", methods=["POST"])
 @login_required
 def cancel_signup(signup_id):
     signup = Signup.query.get_or_404(signup_id)

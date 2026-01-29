@@ -65,7 +65,7 @@ def create_event():
     )
 
 
-@admin_bp.route("/events/<int:event_id>/edit", methods=["GET", "POST"])
+@admin_bp.route("/events/<event_id>/edit", methods=["GET", "POST"])
 def edit_event(event_id):
     event = Event.query.get_or_404(event_id)
     form = EventForm(obj=event)
@@ -81,7 +81,7 @@ def edit_event(event_id):
     return render_template("admin/create_event.html", form=form, title="Edit Event")
 
 
-@admin_bp.route("/events/<int:event_id>/update_meta", methods=["POST"])
+@admin_bp.route("/events/<event_id>/update_meta", methods=["POST"])
 def update_event_meta(event_id):
     event = Event.query.get_or_404(event_id)
     
@@ -111,7 +111,7 @@ def update_event_meta(event_id):
     return redirect(url_for("admin.view_event", event_id=event_id))
 
 
-@admin_bp.route("/events/<int:event_id>/cancel", methods=["POST"])
+@admin_bp.route("/events/<event_id>/cancel", methods=["POST"])
 def cancel_event(event_id):
     event = Event.query.get_or_404(event_id)
     event.status = "cancelled"
@@ -124,7 +124,7 @@ def cancel_event(event_id):
     return redirect(url_for("admin.list_events"))
 
 
-@admin_bp.route("/events/<int:event_id>")
+@admin_bp.route("/events/<event_id>")
 def view_event(event_id):
     event = Event.query.get_or_404(event_id)
 
@@ -145,7 +145,7 @@ def view_event(event_id):
     )
 
 
-@admin_bp.route("/events/<int:event_id>/checkin", methods=["POST"])
+@admin_bp.route("/events/<event_id>/checkin", methods=["POST"])
 def checkin_visitor(event_id):
     event = Event.query.get_or_404(event_id)
     visitor_name = request.form.get("visitor_name")
@@ -183,7 +183,7 @@ def checkin_visitor(event_id):
     return redirect(url_for("admin.view_event", event_id=event_id))
 
 
-@admin_bp.route("/shifts/<int:shift_id>/assign", methods=["POST"])
+@admin_bp.route("/shifts/<shift_id>/assign", methods=["POST"])
 def assign_volunteer(shift_id):
     shift = Shift.query.get_or_404(shift_id)
 
@@ -238,7 +238,7 @@ def assign_volunteer(shift_id):
     return redirect(url_for("admin.view_event", event_id=shift.event_id))
 
 
-@admin_bp.route("/signups/<int:signup_id>/remove", methods=["POST"])
+@admin_bp.route("/signups/<signup_id>/remove", methods=["POST"])
 def remove_signup(signup_id):
     signup = Signup.query.get_or_404(signup_id)
     event_id = signup.shift.event_id
@@ -261,7 +261,7 @@ def manage_signups():
     return render_template("admin/manage_signups.html", signups=pending_signups)
 
 
-@admin_bp.route("/signups/confirm/<int:signup_id>", methods=["POST"])
+@admin_bp.route("/signups/confirm/<signup_id>", methods=["POST"])
 def confirm_signup(signup_id):
     signup = Signup.query.get_or_404(signup_id)
     signup.confirmed = True
@@ -290,7 +290,7 @@ def confirm_signup(signup_id):
     return redirect(url_for("admin.manage_signups"))
 
 
-@admin_bp.route("/signups/reject/<int:signup_id>", methods=["POST"])
+@admin_bp.route("/signups/reject/<signup_id>", methods=["POST"])
 def reject_signup(signup_id):
     signup = Signup.query.get_or_404(signup_id)
     email = signup.volunteer.email
@@ -353,7 +353,7 @@ def add_team_member():
     return render_template("admin/add_team_member.html", form=form)
 
 
-@admin_bp.route("/team/<int:user_id>/edit", methods=["GET", "POST"])
+@admin_bp.route("/team/<user_id>/edit", methods=["GET", "POST"])
 def edit_team_member(user_id):
     user = User.query.get_or_404(user_id)
     form = TeamMemberForm(obj=user)
@@ -521,7 +521,7 @@ def list_emails():
     return render_template("admin/list_emails.html", emails=emails)
 
 
-@admin_bp.route("/emails/<int:email_id>")
+@admin_bp.route("/emails/<email_id>")
 def view_email(email_id):
     from app.models import Email
 
@@ -564,7 +564,7 @@ def create_template():
     )
 
 
-@admin_bp.route("/templates/<int:template_id>/edit", methods=["GET", "POST"])
+@admin_bp.route("/templates/<template_id>/edit", methods=["GET", "POST"])
 def edit_template(template_id):
     from app.forms import EmailTemplateForm
     from app.models import EmailTemplate
@@ -591,7 +591,7 @@ def edit_template(template_id):
     return render_template("admin/edit_template.html", form=form, title="Edit Template")
 
 
-@admin_bp.route("/templates/<int:template_id>/delete", methods=["POST"])
+@admin_bp.route("/templates/<template_id>/delete", methods=["POST"])
 def delete_template(template_id):
     from app.models import EmailTemplate
 
@@ -602,7 +602,7 @@ def delete_template(template_id):
     return redirect(url_for("admin.list_templates"))
 
 
-@admin_bp.route("/events/<int:event_id>/broadcast", methods=["GET", "POST"])
+@admin_bp.route("/events/<event_id>/broadcast", methods=["GET", "POST"])
 def broadcast_email(event_id):
     from app.forms import BroadcastEmailForm
     from flask import current_app

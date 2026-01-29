@@ -28,7 +28,7 @@ def list_visitors():
     )
 
 
-@visitor_bp.route("/checkin/<int:visitor_id>/<int:event_id>", methods=["POST"])
+@visitor_bp.route("/checkin/<visitor_id>/<event_id>", methods=["POST"])
 @login_required
 def check_in(visitor_id, event_id):
     checkin = CheckIn(visitor_id=visitor_id, event_id=event_id)
@@ -56,7 +56,7 @@ def create_visitor():
     )
 
 
-@visitor_bp.route("/<int:visitor_id>/edit", methods=["GET", "POST"])
+@visitor_bp.route("/<visitor_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_visitor(visitor_id):
     visitor = Visitor.query.get_or_404(visitor_id)
@@ -74,7 +74,7 @@ def edit_visitor(visitor_id):
     )
 
 
-@visitor_bp.route("/<int:visitor_id>")
+@visitor_bp.route("/<visitor_id>")
 @login_required
 def view_visitor(visitor_id):
     visitor = Visitor.query.get_or_404(visitor_id)

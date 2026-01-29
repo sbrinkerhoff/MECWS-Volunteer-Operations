@@ -1,4 +1,5 @@
 from datetime import datetime
+import uuid
 
 from flask_login import UserMixin
 
@@ -8,7 +9,7 @@ from app.extensions import db, login_manager
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     name = db.Column(db.String(100))
     emergency_contact = db.Column(db.String(255))
@@ -35,7 +36,7 @@ class User(UserMixin, db.Model):
 class Visitor(db.Model):
     __tablename__ = "visitors"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(100))
     alias = db.Column(db.String(100))
 
@@ -46,7 +47,7 @@ class Visitor(db.Model):
 class Event(db.Model):
     __tablename__ = "events"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     date = db.Column(db.Date, nullable=False, index=True)
     description = db.Column(db.Text)
     status = db.Column(db.String(20), default="projected")  # 'projected', 'confirmed', 'completed', 'cancelled'
@@ -62,8 +63,8 @@ class Event(db.Model):
 class Shift(db.Model):
     __tablename__ = "shifts"
 
-    id = db.Column(db.Integer, primary_key=True)
-    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    event_id = db.Column(db.String(36), db.ForeignKey("events.id"), nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
 
@@ -85,9 +86,9 @@ class Shift(db.Model):
 class Signup(db.Model):
     __tablename__ = "signups"
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    shift_id = db.Column(db.Integer, db.ForeignKey("shifts.id"), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    shift_id = db.Column(db.String(36), db.ForeignKey("shifts.id"), nullable=False)
     confirmed = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -97,15 +98,15 @@ class Signup(db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User.query.get(user_id)
 
 
 class CheckIn(db.Model):
     __tablename__ = "checkins"
 
-    id = db.Column(db.Integer, primary_key=True)
-    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
-    visitor_id = db.Column(db.Integer, db.ForeignKey("visitors.id"), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    event_id = db.Column(db.String(36), db.ForeignKey("events.id"), nullable=False)
+    visitor_id = db.Column(db.String(36), db.ForeignKey("visitors.id"), nullable=False)
     check_in_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     event = db.relationship("Event", backref=db.backref("checkins", lazy="dynamic"))
@@ -118,7 +119,7 @@ class CheckIn(db.Model):
 class Email(db.Model):
     __tablename__ = "emails"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     recipient = db.Column(db.String(120), nullable=False)
     subject = db.Column(db.String(255), nullable=False)
     body_text = db.Column(db.Text)
@@ -136,7 +137,7 @@ class Email(db.Model):
 class EmailTemplate(db.Model):
     __tablename__ = "email_templates"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     slug = db.Column(
         db.String(50), unique=True, nullable=False, index=True
     )  # e.g. 'signup_confirmation'
@@ -152,9 +153,9 @@ class EmailTemplate(db.Model):
 class LoginToken(db.Model):
     __tablename__ = "login_tokens"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     token = db.Column(db.String(36), unique=True, nullable=False, index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
