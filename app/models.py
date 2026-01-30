@@ -27,7 +27,26 @@ class User(UserMixin, db.Model):
     email_allowed = db.Column(db.Boolean, default=True)
     notes = db.Column(db.Text)
 
-    signups = db.relationship("Signup", backref="volunteer", lazy="dynamic")
+    signups = db.relationship("Signup", backref="volunteer", lazy="dynamic", cascade="all, delete-orphan")
+
+    def last_assigned_shift(self):
+        """
+        Returns the date of the last confirmed shift for this user.
+        If no shifts found, returns None.
+        """
+        from app.models import Shift, Event
+        
+        last_signup = (
+            self.signups.filter_by(confirmed=True)
+            .join(Shift)
+            .join(Event)
+            .order_by(Event.date.desc())
+            .first()
+        )
+        
+        if last_signup:
+            return last_signup.shift
+        return None
 
     def __repr__(self):
         return f"<User {self.email}>"
@@ -159,7 +178,7 @@ class LoginToken(db.Model):
     expires_at = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship("User", backref=db.backref("login_tokens", lazy="dynamic"))
+    user = db.relationship("User", backref=db.backref("login_tokens", lazy="dynamic", cascade="all, delete-orphan"))
 
     def __repr__(self):
         return f"<LoginToken {self.token}>"

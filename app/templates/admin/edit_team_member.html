@@ -81,8 +81,23 @@
                         {{ form.email_allowed.label(class="form-check-label") }}
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Update Member</button>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Update Member</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete Member</button>
+                    </div>
                 </form>
+
+                <form id="delete-form" action="{{ url_for('admin.delete_team_member', user_id=user.id) }}" method="POST"
+                    style="display: none;">
+                </form>
+
+                <script>
+                    function confirmDelete() {
+                        if (confirm('Are you sure you want to delete this team member? This action cannot be undone.')) {
+                            document.getElementById('delete-form').submit();
+                        }
+                    }
+                </script>
             </div>
         </div>
     </div>

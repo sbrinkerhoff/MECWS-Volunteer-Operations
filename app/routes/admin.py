@@ -410,6 +410,20 @@ def edit_team_member(user_id):
     return render_template("admin/edit_team_member.html", form=form, user=user)
 
 
+@admin_bp.route("/team/<user_id>/delete", methods=["POST"])
+def delete_team_member(user_id):
+    user = User.query.get_or_404(user_id)
+    email = user.email
+    db.session.delete(user)
+    db.session.commit()
+    
+    from app.audit import log_audit
+    log_audit("delete_user", f"Deleted team member {email}", user=current_user)
+    
+    flash(f"Team member {email} removed.", "info")
+    return redirect(url_for("admin.manage_team"))
+
+
 @admin_bp.route("/team/import", methods=["GET", "POST"])
 def import_team():
     from app.forms import UploadTeamForm
