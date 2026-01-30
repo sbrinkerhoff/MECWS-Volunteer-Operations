@@ -50,7 +50,13 @@
                                 <td class="ps-4">
                                     <div class="d-flex flex-column">
                                         <span class="fw-bold">{{ user.name or 'No Name' }}</span>
-                                        <span class="text-muted small">{{ user.email }}</span>
+                                        <div class="d-flex align-items-center">
+                                            <span class="text-muted small">{{ user.email }}</span>
+                                            {% if user.email_allowed == False %}
+                                            <i class="bi bi-envelope-slash text-danger ms-2"
+                                                title="Unsubscribed from emails"></i>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </td>
                                 <td>

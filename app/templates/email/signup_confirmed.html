@@ -1,8 +1,73 @@
-<p>Dear {{ user.email }},</p>
-<p>Your signup request for the MECWS shelter has been <b>CONFIRMED</b>.</p>
-<ul>
-    <li><b>Event Date:</b> {{ shift.event.date }}</li>
-    <li><b>Shift:</b> {{ shift.start_time }} - {{ shift.end_time }}</li>
-</ul>
-<p>We look forward to seeing you there!</p>
-<p>Sincerely,<br>MECWS Operations</p>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 2px solid #28a745;
+        }
+
+        .content {
+            padding: 20px 0;
+        }
+
+        .details {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .footer {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 20px;
+            border-top: 1px solid #dee2e6;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h3>Signup Confirmed</h3>
+        </div>
+        <div class="content">
+            <p>Dear {{ user.name or user.email }},</p>
+            <p>Your signup request for the MECWS shelter has been <strong>CONFIRMED</strong>.</p>
+
+            <div class="details">
+                <strong>Event Date:</strong> {{ shift.event.date.strftime('%A, %B %d, %Y') }}<br>
+                <strong>Shift Time:</strong> {{ shift.start_time.strftime('%I:%M %p') }} - {{
+                shift.end_time.strftime('%I:%M %p') }}
+            </div>
+
+            <p>We look forward to seeing you there!</p>
+        </div>
+
+
+
+
+        <div class="footer">
+            {{ template['common-email-signature-line'].html }}
+        </div>
+    </div>
+</body>
+
+</html>

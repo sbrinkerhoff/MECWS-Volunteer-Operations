@@ -25,6 +25,7 @@ class User(UserMixin, db.Model):
     )  # 'Beginner', 'Intermediate', 'Advanced'
     shift_preference = db.Column(db.String(50))  # '7:45PM-12AM', '12AM-4AM', '4AM-8AM'
     email_allowed = db.Column(db.Boolean, default=True)
+    unsubscribe_requested = db.Column(db.Boolean, default=False)
     notes = db.Column(db.Text)
 
     signups = db.relationship("Signup", backref="volunteer", lazy="dynamic", cascade="all, delete-orphan")

@@ -52,4 +52,51 @@ def create_app(config_class=Config):
     app.register_blueprint(volunteer_bp)
     app.register_blueprint(visitor_bp)
 
+    @app.context_processor
+    def inject_templates():
+        from app.models import EmailTemplate
+        from markupsafe import Markup
+
+        class TemplateWrapper:
+            def __init__(self, slug):
+                self.slug = slug
+                self._tmpl = None
+            
+            @property
+            def tmpl(self):
+                if self._tmpl is None:
+                    self._tmpl = EmailTemplate.query.filter_by(slug=self.slug).first()
+                return self._tmpl
+
+            @property
+            def html(self):
+                if not self.tmpl or not self.tmpl.body_html:
+                    return ""
+                # Render the content as a template to process variables like {{ unsubscribe_url }}
+                # Note: The context variables must be available in the parent template render context.
+                from flask import render_template_string
+                return Markup(render_template_string(self.tmpl.body_html))
+
+            @property
+            def text(self):
+                if not self.tmpl or not self.tmpl.body_text:
+                    return ""
+                from flask import render_template_string
+                return render_template_string(self.tmpl.body_text)
+            
+            def __getattr__(self, name):
+                return getattr(self.tmpl, name) if self.tmpl else None
+            
+            def __str__(self):
+                return self.text
+
+        class TemplateLoader:
+            def __getitem__(self, key):
+                return TemplateWrapper(key)
+            
+            def __getattr__(self, key):
+                return TemplateWrapper(key)
+
+        return dict(template=TemplateLoader())
+
     return app

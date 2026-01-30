@@ -51,7 +51,8 @@
         <div class="content">
             <p>Dear {{ user.name or 'Volunteer' }},</p>
             <p>Thank you for volunteering! Your signup for the following shift has been received and is
-                <strong>PENDING</strong> approval:</p>
+                <strong>PENDING</strong> approval:
+            </p>
 
             <div class="details">
                 <strong>Event Date:</strong> {{ shift.event.date.strftime('%A, %B %d, %Y') }}<br>
@@ -62,8 +63,12 @@
             <p>A supervisor will review your request shortly. You will receive a separate email once your shift is
                 confirmed.</p>
         </div>
+
+
+
+
         <div class="footer">
-            <p>Best regards,<br>MECWS Team</p>
+            {{ template['common-email-signature-line'].html }}
         </div>
     </div>
 </body>

@@ -8,5 +8,5 @@ This link will expire in 30 minutes.
 
 If you did not request this login, please ignore this email.
 
-Sincerely,
-MECWS Operations
+{{ template['common-email-signature-line'].text }}
+

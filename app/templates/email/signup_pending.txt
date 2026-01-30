@@ -10,5 +10,6 @@ Shift Time: {{ shift.start_time.strftime('%I:%M %p') }} - {{ shift.end_time.strf
 
 A supervisor will review your request shortly. You will receive a separate email once your shift is confirmed.
 
-Best regards,
-MECWS Team
+
+{{ template['common-email-signature-line'].text }}
+

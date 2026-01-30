@@ -155,3 +155,27 @@ def profile():
         return redirect(url_for("main.profile"))
 
     return render_template("profile.html", form=form)
+
+
+@main_bp.route("/unsubscribe", methods=["GET", "POST"])
+def unsubscribe():
+    email = request.args.get("email")
+    if not email:
+        flash("Invalid unsubscribe link.", "danger")
+        return redirect(url_for("main.index"))
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash("Email address not found.", "warning")
+        return redirect(url_for("main.index"))
+        
+    if request.method == "POST":
+        user.unsubscribe_requested = True
+        db.session.commit()
+        
+        from app.audit import log_audit
+        log_audit("unsubscribe", f"User {email} unsubscribed from emails.", user=user)
+        
+        return render_template("unsubscribe_success.html")
+
+    return render_template("unsubscribe.html", email=email)

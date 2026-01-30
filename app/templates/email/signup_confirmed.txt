@@ -1,11 +1,15 @@
-Dear {{ user.email }},
+Signup Confirmed
+----------------
+
+Dear {{ user.name or user.email }},
 
 Your signup request for the MECWS shelter has been CONFIRMED.
 
-Event Date: {{ shift.event.date }}
-Shift: {{ shift.start_time }} - {{ shift.end_time }}
+Event Date: {{ shift.event.date.strftime('%A, %B %d, %Y') }}
+Shift Time: {{ shift.start_time.strftime('%I:%M %p') }} - {{ shift.end_time.strftime('%I:%M %p') }}
 
 We look forward to seeing you there!
 
-Sincerely,
-MECWS Operations
+
+{{ template['common-email-signature-line'].text }}
+
