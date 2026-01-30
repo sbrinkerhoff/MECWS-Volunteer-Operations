@@ -1,4 +1,4 @@
-Below is the Schedule and Contact Info for the Montpelier Emergency Cold Weather Shelter located at City Hall (39 Main Street, Montpelier, VT).
+Below is the Schedule and Contact Info for the Montpelier Emergency Cold Weather Shelter located at City Hall (39 Main Street, Montpelier, VT) for {{ event.date.strftime('%a %-m/%-d/%Y') }}:
 
 {% for shift in shifts %}
 {% set label = "" %}
