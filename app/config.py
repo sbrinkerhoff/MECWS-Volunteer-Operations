@@ -23,3 +23,10 @@ class Config:
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
+
+    # Session Config
+    SESSION_TYPE = "sqlalchemy"
+    SESSION_PERMANENT = True
+    SESSION_USE_SIGNER = True
+    SESSION_KEY_PREFIX = "mecws_session:"
+    SESSION_SQLALCHEMY_TABLE = "sessions"

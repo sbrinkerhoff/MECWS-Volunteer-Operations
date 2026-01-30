@@ -39,6 +39,11 @@ def create_app(config_class=Config):
     bootstrap.init_app(app)
     mail.init_app(app)
 
+    # Initialize Session
+    app.config["SESSION_SQLALCHEMY"] = db
+    from flask_session import Session
+    Session(app)
+
     login_manager.login_view = "main.login"
 
     # Register Blueprints

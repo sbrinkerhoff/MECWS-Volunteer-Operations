@@ -23,6 +23,11 @@
             <div class="d-flex gap-2 align-items-center">
                 <a href="{{ url_for('admin.broadcast_email', event_id=event.id) }}"
                     class="btn btn-outline-info btn-sm"><i class="bi bi-megaphone-fill me-1"></i>Broadcast</a>
+                <form action="{{ url_for('admin.send_schedule', event_id=event.id) }}" method="POST" class="d-inline"
+                    onsubmit="return confirm('Send shift schedule to all volunteers and supervisors?');">
+                    <button type="submit" class="btn btn-outline-primary btn-sm"><i
+                            class="bi bi-envelope-check-fill me-1"></i>Schedule</button>
+                </form>
                 <a href="{{ url_for('admin.list_events') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
             </div>
         </div>
@@ -235,13 +240,14 @@
             {{ label | tojson }},
         {% endfor %}
         ];
+        console.log("Staff List:", staffList);
 
     // Visitor Data
     const visitorList = [
         {% for v in visitors %}
     { { v.name | tojson } },
     {% endfor %}
-        ];
+    ];
 
     // Helper: Setup Autocomplete for a class
     function setupAutocomplete(inputClass, dataList) {

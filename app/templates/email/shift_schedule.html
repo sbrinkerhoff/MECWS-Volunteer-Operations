@@ -1,0 +1,24 @@
+<p>Below is the Schedule and Contact Info for the Shelter Volunteer Team for {{ event.date.strftime('%a %-m/%-d/%Y') }}:
+</p>
+
+{% for shift in shifts %}
+<p>
+    <strong>
+        {% if shift.start_time.strftime('%H:%M') == '19:45' %}
+        Evening Shift, 7:45PM to 12 Midnight:
+        {% elif shift.start_time.strftime('%H:%M') == '00:00' %}
+        Overnight Shift, 12 Midnight to 4:00AM:
+        {% elif shift.start_time.strftime('%H:%M') == '04:00' %}
+        Dawn Shift, 4:00AM to 8:00AM:
+        {% else %}
+        Shift, {{ shift.start_time.strftime('%I:%M%p') }} to {{ shift.end_time.strftime('%I:%M%p') }}:
+        {% endif %}
+    </strong><br>
+    {% for signup in shift.signups %}{% if signup.confirmed %}
+    {{ signup.volunteer.name or signup.volunteer.email }} - {{ signup.volunteer.phone_number or "No Phone" }}<br>
+    {% endif %}{% endfor %}
+</p>
+{% endfor %}
+
+<br>
+{{ template['common-email-signature-line'].html }}

@@ -96,7 +96,7 @@ class ProfileForm(FlaskForm):
 
 
 class AssignVolunteerForm(FlaskForm):
-    user_id = SelectField("Team Member", coerce=int, validators=[DataRequired()])
+    user_id = SelectField("Team Member", coerce=str, validators=[DataRequired()])
     submit = SubmitField("Assign")
 
 

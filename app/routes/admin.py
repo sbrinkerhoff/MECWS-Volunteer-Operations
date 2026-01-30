@@ -686,3 +686,46 @@ def broadcast_email(event_id):
         return redirect(url_for("admin.view_event", event_id=event.id))
 
     return render_template("admin/broadcast_email.html", form=form, event=event)
+
+
+@admin_bp.route("/events/<event_id>/send_schedule", methods=["POST"])
+def send_schedule(event_id):
+    event = Event.query.get_or_404(event_id)
+    
+    # Gather Recipient Pool
+    # 1. Confirmed Volunteers on this event
+    volunteers = set()
+    shifts = event.shifts.all()
+    
+    for shift in shifts:
+        for signup in shift.signups:
+            if signup.confirmed and signup.volunteer.email_allowed:
+                volunteers.add(signup.volunteer)
+    
+    # 2. All Shelter Supervisors
+    supervisors = User.query.filter_by(role="Shelter Supervisor").filter(User.email_allowed != False).all()
+    for sup in supervisors:
+        volunteers.add(sup)
+        
+    recipients = [u.email for u in volunteers if u.email]
+    
+    if not recipients:
+        flash("No recipients found (no confirmed volunteers or supervisors with email enabled).", "warning")
+        return redirect(url_for("admin.view_event", event_id=event.id))
+        
+    from flask import current_app
+    from app.email import send_email
+    
+    # Sort shifts by time for the template
+    shifts_sorted = sorted(shifts, key=lambda s: s.start_time)
+    
+    send_email(
+        f"MECWS Schedule for {event.date.strftime('%a %-m/%-d')}",
+        current_app.config["MAIL_DEFAULT_SENDER"],
+        recipients,
+        render_template("email/shift_schedule.txt", event=event, shifts=shifts_sorted),
+        render_template("email/shift_schedule.html", event=event, shifts=shifts_sorted)
+    )
+    
+    flash(f"Schedule sent to {len(recipients)} people.", "success")
+    return redirect(url_for("admin.view_event", event_id=event.id))
