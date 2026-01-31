@@ -21,8 +21,23 @@ def require_supervisor():
 
 @admin_bp.route("/events")
 def list_events():
-    events = Event.query.order_by(Event.date.desc()).all()
-    return render_template("admin/list_events.html", events=events)
+    events = Event.query.all()
+    
+    active_statuses = ['projected', 'confirmed']
+    # Filter for active events (projected/confirmed) and sort by date ascending (soonest first)
+    active_events = sorted(
+        [e for e in events if e.status in active_statuses],
+        key=lambda x: x.date
+    )
+    
+    # Filter for inactive events (completed/cancelled) and sort by date descending (newest first)
+    inactive_events = sorted(
+        [e for e in events if e.status not in active_statuses],
+        key=lambda x: x.date,
+        reverse=True
+    )
+
+    return render_template("admin/list_events.html", active_events=active_events, inactive_events=inactive_events)
 
 
 @admin_bp.route("/events/new", methods=["GET", "POST"])
@@ -230,10 +245,25 @@ def assign_volunteer(shift_id):
     if existing:
         flash("User is already assigned to this shift.", "warning")
     else:
-        signup = Signup(user_id=user_id, shift_id=shift_id, confirmed=True)
+        # Default to True validation if checked or field missing (legacy behavior was always true)
+        # But we want to allow unconfirmed. 
+        # If 'confirmed' is in form (checkbox), use its value.
+        # The form will have <input type="checkbox" name="confirmed" checked>
+        # The checkbox will send "on" if checked. If unchecked, the key is missing.
+        is_confirmed = request.form.get("confirmed") == "on"
+        # If the form field is missing (e.g. old forms), we might assume True to be safe/backward compatible, 
+        # or we update the form everywhere. 
+        # Since I am updating the only form that calls this, I will rely on the field.
+        # But to be safe: default to True if we aren't sure.
+        
+        signup = Signup(user_id=user_id, shift_id=shift_id, confirmed=is_confirmed)
         db.session.add(signup)
         db.session.commit()
-        flash(f"Volunteer {user.name or user.email} assigned successfully.", "success")
+        
+        if is_confirmed:
+            flash(f"Volunteer {user.name or user.email} assigned successfully.", "success")
+        else:
+            flash(f"Volunteer {user.name or user.email} added (awaiting confirmation).", "info")
 
     return redirect(url_for("admin.view_event", event_id=shift.event_id))
 
@@ -287,6 +317,11 @@ def confirm_signup(signup_id):
     )
 
     flash(f"Signup for {signup.volunteer.email} confirmed.", "success")
+    
+    next_url = request.args.get("next")
+    if next_url:
+        return redirect(next_url)
+        
     return redirect(url_for("admin.manage_signups"))
 
 
@@ -298,6 +333,11 @@ def reject_signup(signup_id):
     db.session.commit()
 
     flash(f"Signup for {email} rejected.", "info")
+    
+    next_url = request.args.get("next")
+    if next_url:
+        return redirect(next_url)
+        
     return redirect(url_for("admin.manage_signups"))
 
 

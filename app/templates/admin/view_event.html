@@ -101,17 +101,13 @@
                                     shift.capacity }} Staffed</span>
                             </div>
 
-                            <h6 class="fw-bold text-muted small text-uppercase mb-2">Team Members</h6>
+                            <h6 class="fw-bold text-muted small text-uppercase mb-2">Confirmed Volunteers</h6>
                             <ul class="list-unstyled mb-3">
-                                {% for signup in shift.signups %}
+                                {% set confirmed_signups = shift.signups.filter_by(confirmed=True).all() %}
+                                {% for signup in confirmed_signups %}
                                 <li class="mb-2 d-flex align-items-center justify-content-between">
                                     <div class="d-flex align-items-center">
-                                        {% if signup.confirmed %}
                                         <i class="bi bi-check-circle-fill text-success me-2" title="Confirmed"></i>
-                                        {% else %}
-                                        <i class="bi bi-clock-fill text-warning me-2" title="Pending Approval"></i>
-                                        {% endif %}
-
                                         <div>
                                             <div class="fw-medium small">{{ signup.volunteer.name or
                                                 signup.volunteer.email }}</div>
@@ -140,28 +136,78 @@
                                     </div>
                                 </li>
                                 {% else %}
-                                <li class="text-muted small fst-italic">No signups yet.</li>
+                                <li class="text-muted small fst-italic">No confirmed volunteers.</li>
                                 {% endfor %}
                             </ul>
 
+                            {% set pending_signups = shift.signups.filter_by(confirmed=False).all() %}
+                            {% if pending_signups %}
+                            <h6 class="fw-bold text-warning small text-uppercase mb-2 mt-3">Pending Signups</h6>
+                            <ul class="list-unstyled mb-3">
+                                {% for signup in pending_signups %}
+                                <li class="mb-2 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-clock-fill text-warning me-2" title="Pending Approval"></i>
+                                        <div>
+                                            <div class="fw-medium small">{{ signup.volunteer.name or
+                                                signup.volunteer.email }}</div>
+                                            <div class="d-flex align-items-center gap-1">
+                                                <span
+                                                    class="badge bg-secondary-subtle text-secondary border border-secondary-subtle py-0 px-1"
+                                                    style="font-size: 0.65rem;">
+                                                    {{ signup.volunteer.level }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <form
+                                            action="{{ url_for('admin.confirm_signup', signup_id=signup.id, next=request.url) }}"
+                                            method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-xs btn-outline-success py-0 border-0"
+                                                title="Confirm"><i class="bi bi-check-lg"></i></button>
+                                        </form>
+                                        <form
+                                            action="{{ url_for('admin.reject_signup', signup_id=signup.id, next=request.url) }}"
+                                            method="POST" class="d-inline"
+                                            onsubmit="return confirm('Reject this signup?');">
+                                            <button type="submit" class="btn btn-xs btn-outline-danger py-0 border-0"
+                                                title="Reject"><i class="bi bi-x-lg"></i></button>
+                                        </form>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+
                             <!-- Assign Volunteer Form -->
                             <hr class="opacity-10 my-2">
-                            <form action="{{ url_for('admin.assign_volunteer', shift_id=shift.id) }}" method="POST"
-                                class="d-flex gap-2 align-items-start">
+                            <form action="{{ url_for('admin.assign_volunteer', shift_id=shift.id) }}" method="POST">
                                 {{ assign_form.hidden_tag() }}
 
-                                <div class="position-relative flex-grow-1">
+                                <div class="position-relative mb-2">
                                     <input type="text" name="user_identifier"
                                         class="form-control form-control-sm search-staff-input"
-                                        placeholder="Type staff name..." autocomplete="off" required>
+                                        placeholder="Add volunteer..." autocomplete="off" required>
                                     <div class="staff-autocomplete-dropdown list-group position-absolute w-100 shadow-lg mt-1"
                                         style="display:none; z-index: 1050; max-height: 200px; overflow-y: auto;">
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-sm btn-outline-primary px-2">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="form-check form-switch mb-0"
+                                        title="Toggle: ON = Confirmed, OFF = Pending">
+                                        <input class="form-check-input toggle-confirmed" type="checkbox"
+                                            name="confirmed" role="switch" id="conf_{{shift.id}}" checked>
+                                        <label class="form-check-label small text-muted status-label"
+                                            for="conf_{{shift.id}}">Confirmed</label>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-sm btn-outline-primary px-2"
+                                        title="Assign Volunteer">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -240,12 +286,12 @@
             {{ label | tojson }},
         {% endfor %}
         ];
-        console.log("Staff List:", staffList);
+    console.log("Staff List:", staffList);
 
     // Visitor Data
     const visitorList = [
         {% for v in visitors %}
-    { { v.name | tojson } },
+    {{ v.name | tojson }},
     {% endfor %}
     ];
 
@@ -296,6 +342,17 @@
     // Initialize for both fields
     setupAutocomplete('.search-staff-input', staffList);
     setupAutocomplete('.search-visitor-input', visitorList);
+
+    // Toggle Label Update
+    document.querySelectorAll('.toggle-confirmed').forEach(toggle => {
+        toggle.addEventListener('change', function () {
+            // Find the label - based on 'for' attribute matching id
+            const label = document.querySelector('label[for="' + this.id + '"]');
+            if (label) {
+                label.textContent = this.checked ? "Confirmed" : "Signup";
+            }
+        });
+    });
     });
 </script>
 {% endblock %}

@@ -10,7 +10,8 @@
             </a>
         </div>
 
-        <div class="card card-glass border-0">
+        <h4 class="mb-3">Projected & Planned</h4>
+        <div class="card card-glass border-0 mb-5">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0 align-middle">
@@ -23,7 +24,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for event in events %}
+                            {% for event in active_events %}
                             <tr style="cursor: pointer;"
                                 onclick="window.location='{{ url_for('admin.view_event', event_id=event.id) }}'">
                                 <td class="ps-4 fw-medium">{{ event.date.strftime('%a, %b %d, %Y') }}</td>
@@ -37,10 +38,6 @@
                                         <span class="badge bg-warning text-dark">Projected</span>
                                         {% elif event.status == 'confirmed' %}
                                         <span class="badge bg-success">Confirmed</span>
-                                        {% elif event.status == 'completed' %}
-                                        <span class="badge bg-secondary">Completed</span>
-                                        {% elif event.status == 'cancelled' %}
-                                        <span class="badge bg-danger">Cancelled</span>
                                         {% else %}
                                         <span class="badge bg-secondary">{{ event.status|title }}</span>
                                         {% endif %}
@@ -75,7 +72,58 @@
                             {% else %}
                             <tr>
                                 <td colspan="5" class="text-center py-5 text-muted">
-                                    No events found. Create one to get started.
+                                    No projected or planned events found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <h4 class="mb-3 text-muted">Completed & Cancelled</h4>
+        <div class="card card-glass border-0 opacity-75">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Date</th>
+                                <th>Shifts</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in inactive_events %}
+                            <tr style="cursor: pointer;"
+                                onclick="window.location='{{ url_for('admin.view_event', event_id=event.id) }}'">
+                                <td class="ps-4 fw-medium">{{ event.date.strftime('%a, %b %d, %Y') }}</td>
+                                <td>
+                                    <span class="badge bg-secondary rounded-pill">{{ event.shifts.count() }}
+                                        Shifts</span>
+                                </td>
+                                <td>
+                                    <div class="mb-1">
+                                        {% if event.status == 'completed' %}
+                                        <span class="badge bg-secondary">Completed</span>
+                                        {% elif event.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ event.status|title }}</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="text-end pe-4" onclick="event.stopPropagation()">
+                                    <a href="{{ url_for('admin.view_event', event_id=event.id) }}"
+                                        class="btn btn-sm btn-outline-primary me-2">View</a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    No completed or cancelled events found.
                                 </td>
                             </tr>
                             {% endfor %}
