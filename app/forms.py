@@ -9,7 +9,7 @@ from wtforms import (
     BooleanField,
     widgets,
 )
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 
@@ -28,6 +28,10 @@ class EventForm(FlaskForm):
     )
     description = TextAreaField("Description")
     submit = SubmitField("Create Event")
+
+    def validate_date(self, field):
+        if field.data and hasattr(field.data, "year") and field.data.year <= 2020:
+            raise ValidationError("Event date must be after 2020.")
 
 
 class VisitorForm(FlaskForm):
