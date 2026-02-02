@@ -9,6 +9,7 @@ from flask import (
     render_template,
     request,
     url_for,
+    make_response,
 )
 from flask_login import current_user, login_required, login_user, logout_user
 
@@ -37,7 +38,7 @@ def login():
         return redirect(url_for("main.dashboard"))
 
     if request.method == "POST":
-        email = request.form.get("email")
+        email = request.form.get("email", "").strip().lower()
         user = User.query.filter_by(email=email).first()
 
         if user:
@@ -67,13 +68,17 @@ def login():
                 sensitive=True
             )
 
-        flash(
-            "If your email is registered, you will receive a login link shortly.",
-            "info",
-        )
-        return redirect(url_for("main.login"))
+            flash("Login link sent! Please check your email inbox.", "success")
+        else:
+            flash('Email not found. Please contact <a href="mailto:coordinator@mecws.org" class="alert-link">coordinator@mecws.org</a> to join as a volunteer.', "danger")
+        resp = make_response(redirect(url_for("main.login")))
+        # Remember email for 30 days
+        expiry = datetime.datetime.utcnow() + datetime.timedelta(days=30)
+        resp.set_cookie('login_email', email, expires=expiry)
+        return resp
 
-    return render_template("login.html")
+    default_email = request.cookies.get('login_email', '')
+    return render_template("login.html", default_email=default_email)
 
 
 @main_bp.route("/login/<token>")
@@ -179,3 +184,8 @@ def unsubscribe():
         return render_template("unsubscribe_success.html")
 
     return render_template("unsubscribe.html", email=email)
+
+
+@main_bp.route("/docs")
+def docs():
+    return render_template("docs.html", title="Volunteer Documentation")

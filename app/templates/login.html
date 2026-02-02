@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="row justify-content-center align-items-center" style="min-height: 60vh;">
-    <div class="col-md-5 col-lg-4 col-xl-3">
+    <div class="col-md-8 col-lg-6">
         <div class="card card-glass border-0 p-4">
             <div class="card-body">
                 <div class="text-center mb-4">
@@ -14,7 +14,7 @@
                     <div class="mb-4">
                         <label for="email" class="form-label fw-medium">Email Address</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com"
-                            required>
+                            value="{{ default_email|default('') }}" required>
                     </div>
 
                     <div class="d-grid">
@@ -28,6 +28,13 @@
                 Restricted access for MECWS staff and volunteers only.
             </div>
         </div>
+
+    </div>
+</div>
+
+<div class="row justify-content-center pb-5">
+    <div class="col-md-10">
+        {{ template['common-login-page-footer'].html }}
     </div>
 </div>
 {% endblock %}

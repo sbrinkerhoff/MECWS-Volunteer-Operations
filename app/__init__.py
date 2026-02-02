@@ -1,4 +1,6 @@
-from flask import Flask
+from flask import Flask, request
+import datetime
+import logging
 
 from app.config import Config
 from app.extensions import bootstrap, db, login_manager, mail, migrate
@@ -22,14 +24,51 @@ def create_app(config_class=Config):
     if not os.path.exists('logs'):
         os.mkdir('logs')
     
+    # File Handler (Detailed with internal timestamp)
     file_handler = RotatingFileHandler('logs/mecws.log', maxBytes=1024 * 1024, backupCount=10)
     file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
     ))
     file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
+
+    # Stream Handler (Clean, for Docker logs)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(logging.Formatter('%(message)s'))
+    stream_handler.setLevel(logging.INFO)
+
+    # Replace default handlers with ours
+    app.logger.handlers = [file_handler, stream_handler]
     app.logger.setLevel(logging.INFO)
+    app.logger.propagate = False
+    
     app.logger.info('MECWS startup')
+
+    # Custom Request Logging (Silence werkzeug)
+    logging.getLogger('werkzeug').setLevel(logging.ERROR)
+    
+    @app.after_request
+    def log_request_info(response):
+        if request.path.startswith('/static'):
+            return response
+            
+        ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        if ip and ',' in ip:
+            ip = ip.split(',')[0].strip()
+
+        from flask_login import current_user
+        try:
+            user_display = f"[{current_user.email}]" if current_user.is_authenticated else "[anonymous]"
+        except:
+            user_display = "[anonymous]"
+        
+        timestamp = datetime.datetime.now().strftime("[%d/%b/%Y %H:%M:%S]")
+        
+        log_msg = f'{ip} - - {timestamp} "{request.method} {request.path} {request.scheme}/{request.environ.get("SERVER_PROTOCOL")}" {response.status_code} - {user_display}'
+        
+        # Log to app logger (goes to File via file_handler and Stdout via stream_handler)
+        app.logger.info(log_msg)
+        
+        return response
 
 
     # Initialize extensions

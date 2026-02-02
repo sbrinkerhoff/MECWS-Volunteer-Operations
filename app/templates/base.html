@@ -157,7 +157,7 @@
                         <div class="col-md-10">
                             {% for category, message in messages %}
                             <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
-                                {{ message }}
+                                {{ message | safe }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"
                                     aria-label="Close"></button>
                             </div>
