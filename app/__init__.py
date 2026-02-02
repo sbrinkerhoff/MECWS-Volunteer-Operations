@@ -51,11 +51,13 @@ def create_app(config_class=Config):
     from app.routes.main import main_bp
     from app.routes.visitor import visitor_bp
     from app.routes.volunteer import volunteer_bp
+    from app.routes.api import api_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(volunteer_bp)
     app.register_blueprint(visitor_bp)
+    app.register_blueprint(api_bp)
 
     @app.context_processor
     def inject_templates():

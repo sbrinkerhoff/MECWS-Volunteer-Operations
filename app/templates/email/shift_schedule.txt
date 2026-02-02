@@ -1,15 +1,16 @@
 Below is the Schedule and Contact Info for the Montpelier Emergency Cold Weather Shelter located at City Hall (39 Main Street, Montpelier, VT) for {{ event.date.strftime('%a %-m/%-d/%Y') }}:
 
-{% for shift in shifts %}
+{% for item in shifts %}
+{% set shift = item.obj %}
 {% set label = "" %}
 {% if shift.start_time.strftime('%H:%M') == '19:45' %}
-Evening Shift, 7:45PM to 12 Midnight:
+Evening Shift ({{ item.date_str }}), 7:45PM to 12 Midnight:
 {% elif shift.start_time.strftime('%H:%M') == '00:00' %}
-Overnight Shift, 12 Midnight to 4:00AM:
+Overnight Shift ({{ item.date_str }}), 12 Midnight to 4:00AM:
 {% elif shift.start_time.strftime('%H:%M') == '04:00' %}
-Dawn Shift, 4:00AM to 8:00AM:
+Dawn Shift ({{ item.date_str }}), 4:00AM to 8:00AM:
 {% else %}
-Shift, {{ shift.start_time.strftime('%I:%M%p') }} to {{ shift.end_time.strftime('%I:%M%p') }}:
+Shift ({{ item.date_str }}), {{ shift.start_time.strftime('%I:%M%p') }} to {{ shift.end_time.strftime('%I:%M%p') }}:
 {% endif %}
 {% for signup in shift.signups %}{% if signup.confirmed %}
 {{ signup.volunteer.name or signup.volunteer.email }} - {{ signup.volunteer.phone_number or "No Phone" }}

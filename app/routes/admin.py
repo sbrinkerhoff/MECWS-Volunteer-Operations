@@ -756,15 +756,32 @@ def send_schedule(event_id):
     from flask import current_app
     from app.email import send_email
     
-    # Sort shifts by time for the template
-    shifts_sorted = sorted(shifts, key=lambda s: s.start_time)
+    from datetime import timedelta
+    
+    # Sort shifts: Evening (Day 0) -> Overnight/Dawn (Day 1)
+    # Logic: If starts before noon, it's next day.
+    def get_sort_key(s):
+        is_next_day = s.start_time.hour < 12
+        return (1 if is_next_day else 0, s.start_time)
+
+    shifts_sorted = sorted(shifts, key=get_sort_key)
+    
+    # Prepare data with dates for template
+    shift_data = []
+    for s in shifts_sorted:
+        is_next_day = s.start_time.hour < 12
+        s_date = event.date + timedelta(days=1) if is_next_day else event.date
+        shift_data.append({
+            'obj': s, 
+            'date_str': s_date.strftime('%a %-m/%-d')
+        })
     
     send_email(
         f"MECWS Schedule for {event.date.strftime('%a %-m/%-d')}",
         current_app.config["MAIL_DEFAULT_SENDER"],
         recipients,
-        render_template("email/shift_schedule.txt", event=event, shifts=shifts_sorted),
-        render_template("email/shift_schedule.html", event=event, shifts=shifts_sorted)
+        render_template("email/shift_schedule.txt", event=event, shifts=shift_data),
+        render_template("email/shift_schedule.html", event=event, shifts=shift_data)
     )
     
     flash(f"Schedule sent to {len(recipients)} people.", "success")
