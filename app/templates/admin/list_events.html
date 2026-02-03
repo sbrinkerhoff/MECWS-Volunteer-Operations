@@ -45,14 +45,18 @@
                                     <div class="d-flex flex-wrap gap-1">
                                         {% for shift in event.shifts %}
                                         {% set count = shift.confirmed_count %}
+                                        {% set pending = shift.signups.filter_by(confirmed=False).count() %}
                                         {% set capacity = shift.capacity %}
-                                        {% set color = 'success' if count >= capacity else 'warning' if count > 0 else
-                                        'secondary' %}
+                                        {% set color = 'success' if count >= capacity else 'warning' if count > 0 or
+                                        pending > 0 else 'secondary' %}
                                         <span
                                             class="badge bg-{{ color }}-subtle text-{{ color }} border border-{{ color }}-subtle"
                                             style="font-size: 0.7em;"
                                             title="Shift {{ shift.start_time.strftime('%I:%M %p') }}">
                                             {{ shift.start_time.strftime('%I:%M') }}: {{ count }}/{{ capacity }}
+                                            {% if pending > 0 %}
+                                            <span class="text-danger fw-bold">(+{{ pending }})</span>
+                                            {% endif %}
                                         </span>
                                         {% endfor %}
                                     </div>

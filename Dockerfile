@@ -2,6 +2,8 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+ENV TZ=America/New_York
+
 # Install uv for fast package management
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
