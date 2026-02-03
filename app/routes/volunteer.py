@@ -1,6 +1,7 @@
-from datetime import date
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
-from flask import Blueprint, flash, redirect, render_template, url_for
+from flask import Blueprint, flash, redirect, render_template, url_for, current_app
 from flask_login import current_user, login_required
 
 from app.models import Event, Shift, Signup, db
@@ -11,7 +12,9 @@ volunteer_bp = Blueprint("volunteer", __name__, url_prefix="/volunteer")
 @volunteer_bp.route("/shifts")
 @login_required
 def available_shifts():
-    query = Event.query.filter(Event.date >= date.today(), Event.status == "confirmed")
+    tz_name = current_app.config.get('TIMEZONE', 'America/New_York')
+    today = datetime.now(ZoneInfo(tz_name)).date()
+    query = Event.query.filter(Event.date >= today, Event.status.in_(["confirmed", "projected"]))
 
     events = query.order_by(Event.date).all()
     print(
@@ -31,7 +34,7 @@ def signup(shift_id):
         return redirect(url_for("volunteer.available_shifts"))
 
     # Check capacity
-    if shift.signups.count() >= shift.capacity:
+    if shift.confirmed_count >= shift.capacity:
         flash("This shift is full.", "danger")
         return redirect(url_for("volunteer.available_shifts"))
 
@@ -84,14 +87,20 @@ def signup(shift_id):
 @volunteer_bp.route("/my-schedule")
 @login_required
 def my_schedule():
-    my_signups = (
+    tz_name = current_app.config.get('TIMEZONE', 'America/New_York')
+    today = datetime.now(ZoneInfo(tz_name)).date()
+
+    query = (
         Signup.query.join(Shift)
         .join(Event)
         .filter(Signup.user_id == current_user.id)
         .order_by(Event.date)
-        .all()
     )
-    return render_template("volunteer/my_schedule.html", signups=my_signups)
+
+    upcoming_signups = query.filter(Event.date >= today).all()
+    past_signups = query.filter(Event.date < today).order_by(Event.date.desc()).all()
+
+    return render_template("volunteer/my_schedule.html", upcoming_signups=upcoming_signups, past_signups=past_signups)
 
 
 @volunteer_bp.route("/signup/<signup_id>/cancel", methods=["POST"])

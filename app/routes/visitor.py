@@ -20,9 +20,14 @@ def require_supervisor():
 def list_visitors():
     visitors = Visitor.query.order_by(Visitor.name).all()
     # Find today's event for check-in context
-    from datetime import date
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from flask import current_app
 
-    today_event = Event.query.filter_by(date=date.today()).first()
+    tz_name = current_app.config.get('TIMEZONE', 'America/New_York')
+    today = datetime.now(ZoneInfo(tz_name)).date()
+
+    today_event = Event.query.filter_by(date=today).first()
     return render_template(
         "visitor/list_visitors.html", visitors=visitors, today_event=today_event
     )

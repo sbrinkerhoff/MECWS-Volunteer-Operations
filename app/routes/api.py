@@ -1,14 +1,23 @@
 
-from datetime import date
-from flask import Blueprint, jsonify
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from flask import Blueprint, jsonify, current_app
 from app.models import Event
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @api_bp.route('/event/today')
 def event_today():
-    today = date.today()
-    event = Event.query.filter_by(date=today).first()
+    tz_name = current_app.config.get('TIMEZONE', 'America/New_York')
+    now = datetime.now(ZoneInfo(tz_name))
+    
+    # If it's before 8AM, show yesterday's event (likely the active shelter night)
+    if now.hour < 8:
+        target_date = now.date() - timedelta(days=1)
+    else:
+        target_date = now.date()
+        
+    event = Event.query.filter_by(date=target_date).first()
     
     if event:
         # Calculate volunteer status

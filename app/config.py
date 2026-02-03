@@ -15,6 +15,7 @@ class Config:
     SHELTER_NAME = os.environ.get("SHELTER_NAME") or "MECWS Shelter"
     WEATHER_LAT = float(os.environ.get("WEATHER_LAT") or 44.2035) # KMPV (Knapp State Airport)
     WEATHER_LON = float(os.environ.get("WEATHER_LON") or -72.5621)
+    TIMEZONE = os.environ.get("TIMEZONE") or "America/New_York"
 
     # Mail Config
     MAIL_SERVER = os.environ.get("MAIL_SERVER")

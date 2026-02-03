@@ -186,6 +186,4 @@ def unsubscribe():
     return render_template("unsubscribe.html", email=email)
 
 
-@main_bp.route("/docs")
-def docs():
-    return render_template("docs.html", title="Volunteer Documentation")
+
