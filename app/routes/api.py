@@ -1,25 +1,36 @@
 
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from flask import Blueprint, jsonify, current_app
+from flask import Blueprint, jsonify, current_app, request
 from app.models import Event
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
+
+@api_bp.route('/event/<date_str>')
 @api_bp.route('/event/today')
-def event_today():
-    tz_name = current_app.config.get('TIMEZONE', 'America/New_York')
-    now = datetime.now(ZoneInfo(tz_name))
+def event_status(date_str="today"):
+    target_date = None
     
-    # If it's before 8AM, show yesterday's event (likely the active shelter night)
-    if now.hour < 8:
-        target_date = now.date() - timedelta(days=1)
-    else:
-        target_date = now.date()
+    if date_str != "today":
+        try:
+            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
+    
+    if target_date is None:
+        tz_name = current_app.config.get('TIMEZONE', 'America/New_York')
+        now = datetime.now(ZoneInfo(tz_name))
+        
+        # If it's before 4AM, show yesterday's event (likely the active shelter night)
+        if now.hour < 4:
+            target_date = now.date() - timedelta(days=1)
+        else:
+            target_date = now.date()
         
     event = Event.query.filter_by(date=target_date).first()
     
-    if event:
+    if event and event.status != 'cancelled':
         # Calculate volunteer status
         total_capacity = sum(s.capacity for s in event.shifts)
         total_confirmed = sum(s.confirmed_count for s in event.shifts)

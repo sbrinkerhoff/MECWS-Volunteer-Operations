@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    network_mode: "host"
+    hostname: mecws-portal-prod01
     build: .
     ports:
       - "5000:5000"

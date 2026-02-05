@@ -20,7 +20,12 @@ def available_shifts():
     print(
         f"DEBUG: User={current_user.email}, Role={current_user.role}, Events={len(events)}"
     )
-    return render_template("volunteer/available_shifts.html", events=events)
+
+    from datetime import timedelta
+    def next_day_date(d):
+        return (d + timedelta(days=1)).strftime('%b %d')
+
+    return render_template("volunteer/available_shifts.html", events=events, next_day_date=next_day_date)
 
 
 @volunteer_bp.route("/signup/<shift_id>", methods=["POST"])

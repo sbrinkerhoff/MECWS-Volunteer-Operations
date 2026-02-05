@@ -48,6 +48,9 @@
                                 <td class="ps-5 text-nowrap">
                                     {{ shift.start_time.strftime('%I:%M %p') }} - {{ shift.end_time.strftime('%I:%M %p')
                                     }}
+                                    {% if shift.start_time.hour < 12 %} <span class="text-muted ms-1 small">({{
+                                        next_day_date(event.date) }})</span>
+                                        {% endif %}
                                 </td>
                                 <td class="text-center">
                                     {% if is_full %}
