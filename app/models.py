@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import uuid
 
 from flask_login import UserMixin
@@ -89,6 +89,7 @@ class Shift(db.Model):
     end_time = db.Column(db.Time, nullable=False)
 
     # "Each shift requires two people to staff it."
+    # "Each shift requires two people to staff it."
     capacity = db.Column(db.Integer, default=2)
 
     signups = db.relationship(
@@ -101,6 +102,17 @@ class Shift(db.Model):
     @property
     def confirmed_count(self):
         return self.signups.filter_by(confirmed=True).count()
+
+    @property
+    def date(self):
+        """
+        Returns the date of the shift.
+        If the shift starts before noon (e.g. 12AM-4AM or 4AM-8AM), 
+        it is assumed to be the day after the event date.
+        """
+        if self.start_time.hour < 12:
+             return self.event.date + timedelta(days=1)
+        return self.event.date
 
 
 class Signup(db.Model):
