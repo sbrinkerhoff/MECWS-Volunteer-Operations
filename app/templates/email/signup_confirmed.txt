@@ -6,7 +6,11 @@ Dear {{ user.name or user.email }},
 Your signup request for the MECWS shelter has been CONFIRMED.
 
 Event Date: {{ shift.event.date.strftime('%A, %B %d, %Y') }}
-Shift Time: {{ shift.start_time.strftime('%I:%M %p') }} - {{ shift.end_time.strftime('%I:%M %p') }}
+Shift Time: {{ shift.start_time.strftime('%I:%M %p') }} - {{ shift.end_time.strftime('%I:%M %p') }}{% if shift.date != shift.event.date %} ({{ shift.date.strftime('%B %d, %Y') }}){% endif %}
+
+If you need to make any change please contact {{ template['common-email-coordinator-contact-info'].text }}.
+
+A follow up email will be sent out with all the volunteers for the evening with shifts and contact information.
 
 We look forward to seeing you there!
 

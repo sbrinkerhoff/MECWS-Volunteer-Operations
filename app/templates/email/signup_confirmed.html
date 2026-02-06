@@ -55,14 +55,17 @@
             <div class="details">
                 <strong>Event Date:</strong> {{ shift.event.date.strftime('%A, %B %d, %Y') }}<br>
                 <strong>Shift Time:</strong> {{ shift.start_time.strftime('%I:%M %p') }} - {{
-                shift.end_time.strftime('%I:%M %p') }}
+                shift.end_time.strftime('%I:%M %p') }}{% if shift.date != shift.event.date %} ({{
+                shift.date.strftime('%B %d, %Y') }}){% endif %}
             </div>
+
+            <p>If you need to make any change please contact {{
+                template['common-email-coordinator-contact-info'].html }}.</p>
+            <p>A follow up email will be sent out with all the volunteers for the evening with shifts and contact
+                information.</p>
 
             <p>We look forward to seeing you there!</p>
         </div>
-
-
-
 
         <div class="footer">
             {{ template['common-email-signature-line'].html }}
