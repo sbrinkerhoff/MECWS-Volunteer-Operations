@@ -1,6 +1,6 @@
 Hello Supervisor,
 
-A new volunteer signup request has been received.
+A new volunteer request has been received.
 
 Volunteer: {{ user.email }}
 Event Date: {{ shift.event.date }}
