@@ -24,6 +24,17 @@ class Config:
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
+    # Force the name to "MECWS Coordinator" to ensure consistency and avoid "MECWS Ops"
+    if MAIL_DEFAULT_SENDER:
+        if '<' in MAIL_DEFAULT_SENDER:
+             # Extract email from "Name <email>" format
+             import re
+             match = re.search(r'<([^>]+)>', MAIL_DEFAULT_SENDER)
+             if match:
+                 MAIL_DEFAULT_SENDER = f"MECWS Coordinator <{match.group(1)}>"
+        elif '@' in MAIL_DEFAULT_SENDER:
+             # Just an email provided
+             MAIL_DEFAULT_SENDER = f"MECWS Coordinator <{MAIL_DEFAULT_SENDER}>"
 
     # Session Config
     SESSION_TYPE = "sqlalchemy"

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   web:
     hostname: mecws-portal-prod01

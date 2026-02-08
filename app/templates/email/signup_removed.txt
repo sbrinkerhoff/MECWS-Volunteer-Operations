@@ -1,0 +1,20 @@
+Schedule Update
+
+Dear {{ user.name or user.email }},
+
+You have been removed from the schedule for the following shift:
+
+Event Date: {{ shift.event.date.strftime('%A, %B %d, %Y') }}
+Shift Time: {{ shift.start_time.strftime('%I:%M %p') }} - {{ shift.end_time.strftime('%I:%M %p') }}{% if shift.date != shift.event.date %} ({{ shift.date.strftime('%B %d, %Y') }}){% endif %}
+
+{% if custom_message %}
+Message from Coordinator:
+{{ custom_message }}
+{% endif %}
+
+We appreciate your willingness to volunteer. If you would like to sign up for other shifts, please view the schedule of available shifts at:
+{{ url_for('volunteer.available_shifts', _external=True) }}
+
+If you have any questions, please contact {{ template['common-email-coordinator-contact-info'].text }}.
+
+{{ template['common-email-signature-line'].text }}

@@ -38,7 +38,7 @@
                                         {{ checkin.event.date.strftime('%A, %B %d, %Y') }}
                                     </a>
                                 </td>
-                                <td>{{ checkin.check_in_time.strftime('%I:%M %p') }}</td>
+                                <td>{{ checkin.check_in_time | to_local_time('%I:%M %p') }}</td>
                                 <td>
                                     {% if checkin.event.status == 'cancelled' %}
                                     <span class="badge bg-danger">Cancelled</span>

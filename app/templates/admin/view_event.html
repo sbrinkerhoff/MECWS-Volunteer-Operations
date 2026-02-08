@@ -261,7 +261,7 @@
                             <tr>
                                 <td>{{ checkin.visitor.name }} <span class="text-muted small">{{ checkin.visitor.alias
                                         }}</span></td>
-                                <td>{{ checkin.check_in_time.strftime('%I:%M %p') }}</td>
+                                <td>{{ checkin.check_in_time | to_local_time('%I:%M %p') }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>

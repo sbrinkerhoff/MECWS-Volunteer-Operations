@@ -97,6 +97,8 @@ def create_app(config_class=Config):
     app.register_blueprint(volunteer_bp)
     app.register_blueprint(visitor_bp)
     app.register_blueprint(api_bp)
+    
+
 
     @app.context_processor
     def inject_templates():
@@ -144,5 +146,31 @@ def create_app(config_class=Config):
                 return TemplateWrapper(key)
 
         return dict(template=TemplateLoader())
+
+    @app.template_filter('to_local_time')
+    def to_local_time_filter(dt, format='%Y-%m-%d %I:%M %p'):
+        if not dt:
+            return ""
+        
+        from zoneinfo import ZoneInfo
+        from datetime import datetime
+        
+        # Ensure it is a datetime object
+        if not isinstance(dt, datetime):
+            return dt
+            
+        # If naive, assume UTC (as stored in DB)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+        
+        try:
+            local_tz = ZoneInfo(app.config['TIMEZONE'])
+            local_dt = dt.astimezone(local_tz)
+            return local_dt.strftime(format)
+        except Exception as e:
+            # Fallback if timezone conversion fails
+            app.logger.error(f"Timezone conversion error: {e}")
+            return dt.strftime(format)
+
 
     return app

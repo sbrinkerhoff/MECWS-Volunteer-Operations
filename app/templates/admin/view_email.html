@@ -38,14 +38,14 @@
                     </div>
                     <div class="col-md-3">
                         <h6 class="text-muted text-uppercase small ls-1">Queued At</h6>
-                        <p>{{ email.created_at.strftime('%Y-%m-%d %I:%M %p') }}</p>
+                        <p>{{ email.created_at | to_local_time }}</p>
                     </div>
                 </div>
 
                 {% if email.sent_at %}
                 <div class="mb-4">
                     <h6 class="text-muted text-uppercase small ls-1">Sent At</h6>
-                    <p>{{ email.sent_at.strftime('%Y-%m-%d %I:%M %p') }}</p>
+                    <p>{{ email.sent_at | to_local_time }}</p>
                 </div>
                 {% endif %}
 
