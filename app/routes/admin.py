@@ -268,10 +268,35 @@ def assign_volunteer(shift_id):
     return redirect(url_for("admin.view_event", event_id=shift.event_id))
 
 
-@admin_bp.route("/signups/<signup_id>/remove", methods=["POST"])
+@admin_bp.route("/signups/<signup_id>/remove", methods=["GET", "POST"])
 def remove_signup(signup_id):
     signup = Signup.query.get_or_404(signup_id)
     event_id = signup.shift.event_id
+    
+    if request.method == "GET":
+        return render_template(
+            "admin/confirm_remove_volunteer.html",
+            signup=signup,
+            action_url=url_for("admin.remove_signup", signup_id=signup_id),
+            cancel_url=url_for("admin.view_event", event_id=event_id)
+        )
+    
+    # POST handling
+    notify = request.form.get("notify") == "true"
+    custom_message = request.form.get("custom_message")
+    
+    if notify and signup.volunteer.email_allowed is not False:
+        from flask import current_app
+        from app.email import send_email
+        
+        send_email(
+            "[MECWS] Schedule Update",
+            current_app.config["MAIL_DEFAULT_SENDER"],
+            [signup.volunteer.email],
+            render_template("email/signup_removed.txt", user=signup.volunteer, shift=signup.shift, custom_message=custom_message),
+            render_template("email/signup_removed.html", user=signup.volunteer, shift=signup.shift, custom_message=custom_message),
+        )
+
     db.session.delete(signup)
     db.session.commit()
     flash("Volunteer removed from shift.", "info")

@@ -127,12 +127,9 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <form action="{{ url_for('admin.remove_signup', signup_id=signup.id) }}"
-                                            method="POST" class="d-inline"
-                                            onsubmit="return confirm('Remove this volunteer?');">
-                                            <button type="submit" class="btn btn-xs btn-outline-danger py-0 border-0"><i
-                                                    class="bi bi-trash"></i></button>
-                                        </form>
+                                        <a href="{{ url_for('admin.remove_signup', signup_id=signup.id) }}"
+                                            class="btn btn-xs btn-outline-danger py-0 border-0" title="Remove"><i
+                                                class="bi bi-trash"></i></a>
                                     </div>
                                 </li>
                                 {% else %}
@@ -291,7 +288,7 @@
     // Visitor Data
     const visitorList = [
         {% for v in visitors %}
-    {{ v.name | tojson }},
+    { { v.name | tojson } },
     {% endfor %}
     ];
 
