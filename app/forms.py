@@ -27,6 +27,7 @@ class EventForm(FlaskForm):
         default="projected",
     )
     description = TextAreaField("Description")
+    notify_coordinators = BooleanField("Notify Coordinators on Signup", default=True)
     submit = SubmitField("Create Event")
 
     def validate_date(self, field):

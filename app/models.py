@@ -71,6 +71,7 @@ class Event(db.Model):
     date = db.Column(db.Date, nullable=False, index=True)
     description = db.Column(db.Text)
     status = db.Column(db.String(20), default="projected")  # 'projected', 'confirmed', 'completed', 'cancelled'
+    notify_coordinators = db.Column(db.Boolean, default=True)
 
     shifts = db.relationship(
         "Shift", backref="event", lazy="dynamic", cascade="all, delete-orphan"

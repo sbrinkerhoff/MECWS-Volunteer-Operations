@@ -67,6 +67,11 @@
                                 <textarea name="description" class="form-control"
                                     rows="4">{{ event.description or '' }}</textarea>
                             </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" name="notify_coordinators" class="form-check-input"
+                                    id="notifyCheck" {% if event.notify_coordinators %}checked{% endif %}>
+                                <label class="form-check-label" for="notifyCheck">Notify Coordinators on Signup</label>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

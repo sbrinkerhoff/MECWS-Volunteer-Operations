@@ -44,7 +44,7 @@ def list_events():
 def create_event():
     form = EventForm()
     if form.validate_on_submit():
-        event = Event(date=form.date.data, status=form.status.data, description=form.description.data)
+        event = Event(date=form.date.data, status=form.status.data, description=form.description.data, notify_coordinators=form.notify_coordinators.data)
         db.session.add(event)
 
         # Create standard shifts
@@ -89,6 +89,7 @@ def edit_event(event_id):
         event.date = form.date.data
         event.status = form.status.data
         event.description = form.description.data
+        event.notify_coordinators = form.notify_coordinators.data
         db.session.commit()
         flash("Event updated successfully.", "success")
         return redirect(url_for("admin.list_events"))
@@ -103,6 +104,7 @@ def update_event_meta(event_id):
     date_str = request.form.get("date")
     status = request.form.get("status")
     description = request.form.get("description")
+    notify = request.form.get("notify_coordinators") == "on"
     
     from datetime import datetime
     try:
@@ -116,6 +118,7 @@ def update_event_meta(event_id):
         event.status = status
         
     event.description = description
+    event.notify_coordinators = notify
     
     db.session.commit()
     

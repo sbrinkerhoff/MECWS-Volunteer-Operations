@@ -57,7 +57,7 @@ def signup(shift_id):
     # Filter supervisors who allow emails (default to True if None)
     supervisor_emails = [s.email for s in supervisors if s.email_allowed is not False]
 
-    if supervisor_emails:
+    if shift.event.notify_coordinators and supervisor_emails:
         admin_url = url_for("admin.manage_signups", _external=True)
         send_email(
             "[MECWS] New Volunteer Signup",
