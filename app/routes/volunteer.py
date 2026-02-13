@@ -44,6 +44,9 @@ def signup(shift_id):
     db.session.add(signup_entry)
     db.session.commit()
 
+    from app.audit import log_audit
+    log_audit("volunteer_signup", f"User signed up for shift {shift.id} on {shift.event.date} ({shift.start_time}-{shift.end_time})")
+
     # Mock Notification
     # print(f"NOTIFICATION: User {current_user.email} signed up for Shift {shift.id}. Supervisor needs to confirm.")
 

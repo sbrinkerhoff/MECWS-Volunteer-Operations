@@ -263,6 +263,9 @@ def assign_volunteer(shift_id):
         db.session.add(signup)
         db.session.commit()
         
+        from app.audit import log_audit
+        log_audit("admin_assign_volunteer", f"Assigned {user.email} to shift {shift.id} confirmed={is_confirmed}", user=current_user)
+        
         if is_confirmed:
             flash(f"Volunteer {user.name or user.email} assigned successfully.", "success")
         else:
@@ -302,6 +305,9 @@ def remove_signup(signup_id):
 
     db.session.delete(signup)
     db.session.commit()
+    
+    from app.audit import log_audit
+    log_audit("admin_remove_volunteer", f"Removed {signup.volunteer.email} from shift {signup.shift_id} on {signup.shift.event.date}", user=current_user)
     flash("Volunteer removed from shift.", "info")
     return redirect(url_for("admin.view_event", event_id=event_id))
 
@@ -324,6 +330,9 @@ def confirm_signup(signup_id):
     signup = Signup.query.get_or_404(signup_id)
     signup.confirmed = True
     db.session.commit()
+
+    from app.audit import log_audit
+    log_audit("admin_confirm_volunteer", f"Confirmed {signup.volunteer.email} for shift {signup.shift_id} on {signup.shift.event.date}", user=current_user)
 
     # Mock Notification
     # print(f"NOTIFICATION SENT TO {signup.volunteer.email}: Your signup for {signup.shift.event.date} has been CONFIRMED.")
@@ -359,6 +368,9 @@ def reject_signup(signup_id):
     email = signup.volunteer.email
     db.session.delete(signup)
     db.session.commit()
+
+    from app.audit import log_audit
+    log_audit("admin_reject_volunteer", f"Rejected {email} for shift {signup.shift_id}", user=current_user)
 
     flash(f"Signup for {email} rejected.", "info")
     
